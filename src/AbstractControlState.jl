@@ -1,5 +1,6 @@
 """
-The TypeTemplate.jl module demonstrates a Julia module.
+The AbstractControlState.jl module defines the AbstractControlState type and
+methods
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the XYZ package. It is subject to
@@ -13,21 +14,22 @@ contained in the LICENSE file.
 
 # ------ Types
 
-export Node
+export AbstractControlState
 
 # ------ Functions
 
-export say_hello, add_one
+export process_control_signal
 
-# --- Type definition
+# --- Type definitions
 
-struct Node
-    #=
-      Fields
-      ------
-      * `id`: node ID
-      * `connections`: Dict
-    =#
-    id::Int
-    connections::Dict{Int, Int}
-end
+"""
+    AbstractControlState
+
+Supertype for control state types.
+
+Interface
+=========
+
+    process_control_signal(state::AbstractControlState, signal::Vector{UInt8})
+"""
+abstract type AbstractControlState end
