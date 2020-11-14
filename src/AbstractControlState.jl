@@ -18,7 +18,9 @@ export AbstractControlState
 
 # ------ Functions
 
-export decode_signal, process_control_signal
+export decode_control_signal
+export get_exception_signal
+export process_control_signal
 
 # --- Type definitions
 
@@ -31,7 +33,10 @@ mutable so that they can be modified as the control state changes.
 Interface
 =========
 
-    decode_signal(bytes::Vector{UInt8}, ::Type{<:AbstractControlState})
+    decode_control_signal(::Type{<:AbstractControlState}, bytes::Vector{UInt8})
+
+    get_exception_signal(::Type{<:AbstractControlState})
+
     process_control_signal!(signal, state::AbstractControlState)
 """
 abstract type AbstractControlState end
@@ -42,11 +47,19 @@ abstract type AbstractControlState end
 #       a central location for docstrings.
 
 """
-    decode_signal(bytes::Vector{UInt8}, ::Type{<:AbstractControlState})
+    decode_control_signal(bytes::Vector{UInt8}, ::Type{<:AbstractControlState})
 
 Convert `bytes` to a signal that is understood by `process_control_signal()`.
 """
-decode_signal(::Type{<:AbstractControlState}, bytes::Vector{UInt8}) = nothing
+decode_control_signal(::Type{<:AbstractControlState}, bytes::Vector{UInt8}) =
+    nothing
+
+"""
+    get_exception_signal(::Type{<:AbstractControlState})
+
+Return the response to send when `process_control_signal()` fails.
+"""
+get_exception_signal(::Type{<:AbstractControlState}) = nothing
 
 """
     process_control_signal(signal, state::AbstractControlState)

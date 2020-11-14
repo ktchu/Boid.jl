@@ -67,13 +67,13 @@ end
 function run(control_unit::ControlUnit)
     # Wait for control signal
     message = recv(control_unit.control_channel, Vector{UInt8})
-    control_signal = decode_signal(typeof(control_unit.state), message)
+    control_signal = decode_control_signal(typeof(control_unit.state), message)
 
     # Process control signal
     try
         response = process_control_signal!(control_signal, control_unit.state)
     catch
-        response = "ERROR"
+        response = get_exception_signal(typeof(control_unit.state))
     end
 
     # Send response

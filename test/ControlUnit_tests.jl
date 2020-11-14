@@ -46,8 +46,12 @@ end
     INCREMENT
 end
 
-function Boid.decode_signal(::Type{ControlState}, bytes::Vector{UInt8})
+function Boid.decode_control_signal(::Type{ControlState}, bytes::Vector{UInt8})
     return reinterpret(ControlSignal, bytes)[1]
+end
+
+function Boid.get_exception_signal(::Type{ControlState})
+    return "FAILED"
 end
 
 function Boid.process_control_signal!(signal, state::ControlState)
@@ -133,7 +137,7 @@ end
     connect(socket, control_url)
     send(socket, 100)
     response = recv(socket, String)
-    @test response == "ERROR"
+    @test response == get_exception_signal(ControlState)
 
     # --- Clean up
     _tearDown()
