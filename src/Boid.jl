@@ -1,5 +1,6 @@
 """
-The Boid.jl module demonstrates a Julia module.
+The Boid.jl module defines types and functions to support autonomous,
+distributed computing/processing.
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the XYZ package. It is subject to
@@ -14,5 +15,8 @@ module Boid
 # Types
 include("AbstractControlState.jl")
 include("ControlUnit.jl")
+
+# Methods
+include("utils.jl")
 
 end  # End of Boid.jl module

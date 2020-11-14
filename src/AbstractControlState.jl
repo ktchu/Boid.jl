@@ -18,18 +18,40 @@ export AbstractControlState
 
 # ------ Functions
 
-export process_control_signal
+export decode_signal, process_control_signal
 
 # --- Type definitions
 
 """
     AbstractControlState
 
-Supertype for control state types.
+Supertype for control state types. In general, concrete subtypes should be
+mutable so that they can be modified as the control state changes.
 
 Interface
 =========
 
-    process_control_signal(state::AbstractControlState, signal::Vector{UInt8})
+    decode_signal(bytes::Vector{UInt8}, ::Type{<:AbstractControlState})
+    process_control_signal!(signal, state::AbstractControlState)
 """
 abstract type AbstractControlState end
+
+# --- Method definitions
+#
+# Note: the following method definitions are no-op place holders to provide
+#       a central location for docstrings.
+
+"""
+    decode_signal(bytes::Vector{UInt8}, ::Type{<:AbstractControlState})
+
+Convert `bytes` to a signal that is understood by `process_control_signal()`.
+"""
+decode_signal(::Type{<:AbstractControlState}, bytes::Vector{UInt8}) = nothing
+
+"""
+    process_control_signal(signal, state::AbstractControlState)
+
+Process the control `signal`, updating `state` and returning a response as
+appropriate.
+"""
+process_control_signal!(signal, state::AbstractControlState) = nothing

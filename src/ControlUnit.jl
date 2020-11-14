@@ -58,7 +58,7 @@ struct ControlUnit
         end
 
         # Return new ControlUnit
-        new(state, control_url, control_channel)
+        new(deepcopy(state), control_url, control_channel)
     end
 end
 
@@ -66,16 +66,21 @@ end
 
 function run(control_unit::ControlUnit)
     # Wait for control signal
-    control_signal = recv(control_unit.control_channel)
+    message = recv(control_unit.control_channel, Vector{UInt8})
+    control_signal = decode_signal(typeof(control_unit.state), message)
 
     # Process control signal
-    response = process_control_signal(control_unit.state, control_signal)
+    try
+        response = process_control_signal!(control_signal, control_unit.state)
+    catch
+        response = "ERROR"
+    end
 
     # Send response
     if isnothing(response)
         response = ""
     end
-    send(node.control_channel, response)
+    send(control_unit.control_channel, response)
 
     # Restart control unit
     @async run(control_unit)

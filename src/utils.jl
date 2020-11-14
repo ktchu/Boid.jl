@@ -1,5 +1,5 @@
 """
-The MethodTemplate.jl module demonstrates a Julia module.
+utils.jl defines utility methods.
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the XYZ package. It is subject to
@@ -11,20 +11,24 @@ contained in the LICENSE file.
 """
 # --- Exports
 
-export say_hello, add_one
+export construct_ipc_url
 
 # --- Method definitions
 
 """
-    say_hello(who::String)
+    construct_ipc_url(ipc_dir::String, ipc_name::String)
 
-Return "Hello, `who`".
+Construct IPC URL from `ipc_dir` and `ipc_name`.
 """
-say_hello(who::String) = "Hello, $who"
+function construct_ipc_url(ipc_dir::String, ipc_name::String)
+    if occursin("ipc://", ipc_dir)
+        if !startswith(ipc_dir, "ipc://")
+            message = """Invalid `ipc_dir` "$(ipc_dir)"."""
+            throw(ArgumentError(message))
+        end
+    elseif !startswith(ipc_dir, "ipc://")
+        ipc_dir = "ipc://" * ipc_dir
+    end
 
-"""
-    add_one(x)
-
-Return `x + 1`.
-"""
-add_one(x) = x + 1
+    return joinpath(ipc_dir, ipc_name)
+end
