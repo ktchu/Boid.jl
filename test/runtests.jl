@@ -25,6 +25,6 @@ using Boid
     doctest(Boid)
 end
 
-@testset ExtendedTestSet "All the tests" begin
+@testset ExtendedTestSet "Unit tests" begin
     @includetests
 end
