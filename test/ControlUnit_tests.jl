@@ -19,8 +19,6 @@ using ZMQ
 
 # Boid.jl package
 using Boid
-import Boid.decode_signal
-import Boid.process_control_signal!
 
 # --- Test fixtures
 
@@ -48,11 +46,11 @@ end
     INCREMENT
 end
 
-function decode_signal(::Type{ControlState}, bytes::Vector{UInt8})
+function Boid.decode_signal(::Type{ControlState}, bytes::Vector{UInt8})
     return reinterpret(ControlSignal, bytes)[1]
 end
 
-function process_control_signal!(signal, state::ControlState)
+function Boid.process_control_signal!(signal, state::ControlState)
     if signal == START
         state.is_running = true
     elseif signal == STOP
