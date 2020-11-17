@@ -21,10 +21,12 @@ using Boid
 
 # --- Test sets
 
-@testset "Doctests" begin
-    doctest(Boid)
-end
+@testset ExtendedTestSet "All the tests" begin
+    @testset "Doctests" begin
+        doctest(Boid)
+    end
 
-@testset ExtendedTestSet "Unit tests" begin
-    @includetests
+    @testset "Unit tests" begin
+        @includetests
+    end
 end
