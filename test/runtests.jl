@@ -27,6 +27,6 @@ using Boid
     end
 
     @testset "Unit tests" begin
-        @includetests
+        @includetests ARGS
     end
 end
