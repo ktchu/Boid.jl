@@ -47,7 +47,7 @@ abstract type AbstractControlState end
 #       a central location for docstrings.
 
 """
-    decode_control_signal(bytes::Vector{UInt8}, ::Type{<:AbstractControlState})
+    decode_control_signal(::Type{<:AbstractControlState}, bytes::Vector{UInt8})
 
 Convert `bytes` to a signal that is understood by `process_control_signal()`.
 """

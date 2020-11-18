@@ -89,7 +89,7 @@ end
     @test control_unit.state isa ControlState
     @test control_unit.state !== state
     @test control_unit.control_url == control_url
-    @test control_unit.control_channel isa Socket
+    @test control_unit.control_socket isa Socket
 
     # copy_state == false
     control_unit = ControlUnit(state, control_url, copy_state=false)
@@ -97,7 +97,7 @@ end
     @test control_unit.state isa ControlState
     @test control_unit.state === state
     @test control_unit.control_url == control_url
-    @test control_unit.control_channel isa Socket
+    @test control_unit.control_socket isa Socket
 
     # --- Clean up
     _tearDown()
