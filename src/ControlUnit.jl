@@ -45,6 +45,7 @@ struct ControlUnit
 
     function ControlUnit(state::AbstractControlState,
                          control_url::String;
+                         copy_state=true,
                          use_bind=true)
 
         # Create Socket to listen for control signals on
@@ -58,7 +59,11 @@ struct ControlUnit
         end
 
         # Return new ControlUnit
-        new(deepcopy(state), control_url, control_channel)
+        if copy_state
+            new(deepcopy(state), control_url, control_channel)
+        else
+            new(state, control_url, control_channel)
+        end
     end
 end
 

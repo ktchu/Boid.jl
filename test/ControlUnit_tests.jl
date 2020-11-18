@@ -83,10 +83,19 @@ end
 
     # --- Tests
 
+    # copy_state == true
     control_unit = ControlUnit(state, control_url)
 
     @test control_unit.state isa ControlState
     @test control_unit.state !== state
+    @test control_unit.control_url == control_url
+    @test control_unit.control_channel isa Socket
+
+    # copy_state == false
+    control_unit = ControlUnit(state, control_url, copy_state=false)
+
+    @test control_unit.state isa ControlState
+    @test control_unit.state === state
     @test control_unit.control_url == control_url
     @test control_unit.control_channel isa Socket
 
