@@ -24,9 +24,10 @@ import Base.run
 using ZMQ
 
 """
-    ControlUnit
+    struct ControlUnit
 
-TODO
+Component that listens for and proceses control signals. The `state` field
+stores the current state of the processing unit.
 """
 struct ControlUnit
     #=
