@@ -16,6 +16,13 @@ module Boid
 include("AbstractControlState.jl")
 include("ControlUnit.jl")
 
+include("AbstractInputData.jl")
+include("InputChannel.jl")
+
+# include("AbstractProcessingCore.jl")
+
+# include("Node.jl")
+
 # Methods
 include("utils.jl")
 
