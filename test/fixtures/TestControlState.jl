@@ -1,5 +1,6 @@
 """
-Fixtures for unit tests.
+TestControlState.jl defines the TestControlState and TestControlSignal types
+and methods
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the XYZ package. It is subject to
@@ -9,39 +10,35 @@ copied, modified, propagated, or distributed except according to the terms
 contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
-# --- Constants
+# --- TestControlState
 
-control_url = construct_ipc_url(".", "control-unit-test.zmq")
-ipc_path = control_url[7:end]
-
-# --- ControlState
-
-mutable struct ControlState <: AbstractControlState
+mutable struct TestControlState <: AbstractControlState
     is_running::Bool
     count::Int
 
-    function ControlState()
+    function TestControlState()
         is_running = false
         count = 0
         new(is_running, count)
     end
 end
 
-@enum ControlSignal begin
+@enum TestControlSignal begin
     START
     STOP
     INCREMENT
 end
 
-function Boid.decode_control_signal(::Type{ControlState}, bytes::Vector{UInt8})
-    return reinterpret(ControlSignal, bytes)[1]
+function Boid.decode_control_signal(::Type{TestControlState},
+                                    bytes::Vector{UInt8})
+    return reinterpret(TestControlSignal, bytes)[1]
 end
 
-function Boid.get_exception_signal(::Type{ControlState})
+function Boid.get_exception_signal(::Type{TestControlState})
     return "FAILED"
 end
 
-function Boid.process_control_signal!(signal, state::ControlState)
+function Boid.process_control_signal!(signal, state::TestControlState)
     if signal == START
         state.is_running = true
     elseif signal == STOP

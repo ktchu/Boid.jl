@@ -22,7 +22,11 @@ using Boid
 
 # --- Test fixtures
 
-include("fixtures.jl")
+include("fixtures/TestControlState.jl")
+
+# Constants
+control_url = construct_ipc_url(".", "control-unit-test.zmq")
+ipc_path = control_url[7:end]
 
 # --- Set up/tear down methods
 
@@ -35,14 +39,14 @@ end
 @testset "ControlUnit: constructor" begin
     # --- Preparations
 
-    state = ControlState()
+    state = TestControlState()
 
     # --- Tests
 
     # copy_state == true
     control_unit = ControlUnit(state, control_url)
 
-    @test control_unit.state isa ControlState
+    @test control_unit.state isa TestControlState
     @test control_unit.state !== state
     @test control_unit.control_url == control_url
     @test control_unit.control_socket isa Socket
@@ -50,7 +54,7 @@ end
     # copy_state == false
     control_unit = ControlUnit(state, control_url, copy_state=false)
 
-    @test control_unit.state isa ControlState
+    @test control_unit.state isa TestControlState
     @test control_unit.state === state
     @test control_unit.control_url == control_url
     @test control_unit.control_socket isa Socket
@@ -62,7 +66,7 @@ end
 @testset "ControlUnit: run()" begin
     # --- Preparations
 
-    state = ControlState()
+    state = TestControlState()
     control_unit = ControlUnit(state, control_url)
 
     # --- Tests
@@ -102,7 +106,7 @@ end
     connect(socket, control_url)
     send(socket, 100)
     response = recv(socket, String)
-    @test response == get_exception_signal(ControlState)
+    @test response == get_exception_signal(TestControlState)
 
     # --- Clean up
     _tearDown()
