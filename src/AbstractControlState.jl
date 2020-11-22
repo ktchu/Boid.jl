@@ -37,6 +37,12 @@ Interface
     get_exception_signal(::Type{<:AbstractControlState})
 
     process_control_signal!(signal, state::AbstractControlState)
+
+Common Signals to Support
+-------------------------
+
+* Request for the output type. To support this signal, include the Node or
+  OutputChannel as a field in the concrete subtype.
 """
 abstract type AbstractControlState end
 

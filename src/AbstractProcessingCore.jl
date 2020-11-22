@@ -1,6 +1,5 @@
 """
-The Boid.jl module defines types and functions to support autonomous,
-distributed computing/processing.
+AbstractProcessingCore.jl defines the AbstractProcessingCore type and interface
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the XYZ package. It is subject to
@@ -10,22 +9,28 @@ copied, modified, propagated, or distributed except according to the terms
 contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
-module Boid
+# --- Exports
 
-# Abstract Types
-include("AbstractDataPacket.jl")
-include("AbstractControlState.jl")
-include("AbstractProcessingCore.jl")
+# ------ Types
 
-# Concrete Types
-include("InputChannel.jl")
-include("OutputChannel.jl")
+export AbstractProcessingCore
 
-include("ControlUnit.jl")
+# ------ Functions
 
-include("Node.jl")
+# TODO
 
-# Methods
-include("utils.jl")
+# --- Type definitions
 
-end  # End of Boid.jl module
+"""
+    AbstractProcessingCore
+
+Supertype for all processing core types.
+
+Interface
+=========
+
+Functions
+---------
+* TODO
+"""
+abstract type AbstractProcessingCore end

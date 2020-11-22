@@ -17,7 +17,7 @@ export InputChannel
 
 # ------ Functions
 
-import Base.run
+export listen
 
 # --- Type definitions
 
@@ -26,7 +26,7 @@ using ZMQ
 """
     struct InputChannel
 
-Component that listens for decodes input data. The `inputs` field stores the
+Component that listens for and decodes input data. The `data` field stores the
 data most recently received by the channel.
 """
 struct InputChannel
@@ -37,21 +37,29 @@ struct InputChannel
 
       * `input_url`: URL that InputChannel listens for input data on
 
-      * `input_socket`: ZMQ Socket for receiving input data
+      * `input_socket`: ZMQ Socket for receiving data
     =#
-    data::AbstractInputData
+    data::AbstractDataPacket
     input_url::String
     input_socket::Socket
 
-    function InputChannel(InputDataType::Type{<:AbstractInputData},
+    # TODO: Remove
+    # Temporary constructor
+    InputChannel() = new()
+
+    """
+    TODO
+    """
+    function InputChannel(data_type::Type{<:AbstractDataPacket},
                           input_url::String;
                           use_bind=false)
 
         # Create data storage
-        data = InputDataType()
+        data = data_type()
 
         # Create Socket to listen for input data
         input_socket = Socket(SUB)
+        subscribe(input_socket, "")
 
         # Connect socket to URL
         if use_bind
@@ -67,7 +75,7 @@ end
 
 # --- Method definitions
 
-function run(input_channel::InputChannel)
+function listen(input_channel::InputChannel)
     # Wait for input data
     message = recv(input_channel.input_socket, Vector{UInt8})
 
@@ -75,5 +83,5 @@ function run(input_channel::InputChannel)
     decode_input_data(typeof(input_channel.data), message)
 
     # Restart input_channel
-    @async run(input_channel)
+    @async listen(input_channel)
 end
