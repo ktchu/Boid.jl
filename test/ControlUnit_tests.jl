@@ -27,12 +27,12 @@ include("fixtures/TestControlState.jl")
 
 # Constants
 control_url = construct_ipc_url(".", "control-unit-test.zmq")
-ipc_path = control_url[7:end]
+control_ipc_path = control_url[7:end]
 
 # --- Set up/tear down methods
 
 function _tearDown()
-    rm(ipc_path, force=true)
+    rm(control_ipc_path, force=true)
 end
 
 # --- Constructor tests
