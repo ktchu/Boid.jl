@@ -70,14 +70,15 @@ end
 
 # --- Method definitions
 
-function run(control_unit::ControlUnit)
+function run(control_unit::ControlUnit;
+             node::Union{AbstractNode, Nothing}=nothing)
     # Wait for control signal
     message = recv(control_unit.control_socket, Vector{UInt8})
     control_signal = decode_control_signal(typeof(control_unit.state), message)
 
     # Process control signal
     try
-        response = process_control_signal!(control_signal, control_unit.state)
+        response = process_control_signal!(control_unit.state, control_signal)
     catch
         response = get_exception_signal(typeof(control_unit.state))
     end
@@ -89,5 +90,5 @@ function run(control_unit::ControlUnit)
     send(control_unit.control_socket, response)
 
     # Restart control unit
-    @async run(control_unit)
+    @async run(control_unit, node=node)
 end

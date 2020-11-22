@@ -1,6 +1,5 @@
 """
-TestControlState.jl defines the TestControlState and TestControlSignal types
-and methods
+TestControlState.jl defines the TestControlState type and methods
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the XYZ package. It is subject to
@@ -38,7 +37,7 @@ function Boid.get_exception_signal(::Type{TestControlState})
     return "FAILED"
 end
 
-function Boid.process_control_signal!(signal, state::TestControlState)
+function Boid.process_control_signal!(state::TestControlState, signal)
     if signal == START
         state.is_running = true
     elseif signal == STOP

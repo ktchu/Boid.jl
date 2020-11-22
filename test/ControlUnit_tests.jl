@@ -64,7 +64,7 @@ end
     _tearDown()
 end
 
-@testset "ControlUnit: run()" begin
+@testset "ControlUnit: run(). `node` == nothing" begin
     # --- Preparations
 
     state = TestControlState()
@@ -108,6 +108,58 @@ end
     send(socket, 100)
     response = recv(socket, String)
     @test response == get_exception_signal(TestControlState)
+
+    # --- Clean up
+    _tearDown()
+end
+
+@testset "ControlUnit: run(). `node` != nothing" begin
+    @test_skip 1
+#=
+    # --- Preparations
+
+    state = TestControlState()
+    control_unit = ControlUnit(state, control_url)
+
+    # --- Tests
+
+    # Start run()
+    @async run(control_unit)
+
+    # Sent START signal
+    socket = Socket(REQ)
+    connect(socket, control_url)
+    send(socket, START)
+    response = recv(socket, String)
+    @test_skip control_unit.state.is_running == true
+    @test_skip control_unit.state.count == 0
+    @test_skip response == "SUCCESS"
+
+    # Sent STOP signal
+    socket = Socket(REQ)
+    connect(socket, control_url)
+    send(socket, STOP)
+    response = recv(socket, String)
+    @test control_unit.state.is_running == false
+    @test control_unit.state.count == 0
+    @test response == "SUCCESS"
+
+    # Sent INCREMENT signal
+    socket = Socket(REQ)
+    connect(socket, control_url)
+    send(socket, INCREMENT)
+    response = recv(socket, String)
+    @test control_unit.state.is_running == false
+    @test control_unit.state.count == 1
+    @test response == "SUCCESS"
+
+    # Sent unknown signal
+    socket = Socket(REQ)
+    connect(socket, control_url)
+    send(socket, 100)
+    response = recv(socket, String)
+    @test response == get_exception_signal(TestControlState)
+=#
 
     # --- Clean up
     _tearDown()

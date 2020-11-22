@@ -1,6 +1,5 @@
 """
-The AbstractControlState.jl module defines the AbstractControlState type and
-methods
+AbstractControlState.jl defines the AbstractControlState type and methods
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the XYZ package. It is subject to
@@ -62,9 +61,9 @@ Return the response to send when `process_control_signal()` fails.
 get_exception_signal(::Type{<:AbstractControlState}) = nothing
 
 """
-    process_control_signal(signal, state::AbstractControlState)
+    process_control_signal!(state::AbstractControlState, signal)
 
 Process the control `signal`, updating `state` and returning a response as
 appropriate.
 """
-process_control_signal!(signal, state::AbstractControlState) = nothing
+process_control_signal!(state::AbstractControlState, signal) = nothing
