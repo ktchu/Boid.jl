@@ -22,6 +22,7 @@ using Boid
 
 # --- Test fixtures
 
+# Concrete subtype of AbstractControlState
 include("fixtures/TestControlState.jl")
 
 # Constants
