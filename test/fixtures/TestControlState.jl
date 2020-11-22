@@ -9,6 +9,10 @@ copied, modified, propagated, or distributed except according to the terms
 contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
+# --- Imports
+
+using Boid: AbstractControlState
+
 # --- TestControlState
 
 mutable struct TestControlState <: AbstractControlState
