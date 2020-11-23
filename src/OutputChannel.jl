@@ -39,14 +39,14 @@ struct OutputChannel
 
       * `output_socket`: ZMQ Socket for sending data
     =#
-    data::AbstractDataPacket
+    data::AbstractChannelData
     output_url::String
     output_socket::Socket
 end
 
 
 """
-    OutputChannel(data_type::Type{<:AbstractDataPacket}, output_url::String;
+    OutputChannel(data_type::Type{<:AbstractChannelData}, output_url::String;
                  use_bind=false)
 
 Construct an input channel that publishes data of type `data_type` to
@@ -56,7 +56,7 @@ When `use_bind` is true, the ZMQ Socket that messages are published to is
 connected to `output_url` using the `bind()` method. Otherwise, the ZMQ Socket
 is connected to `output_url` using the `connect()` method.
 """
-function OutputChannel(data_type::Type{<:AbstractDataPacket},
+function OutputChannel(data_type::Type{<:AbstractChannelData},
                        output_url::String;
                        use_bind=true)
 

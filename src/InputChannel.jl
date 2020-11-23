@@ -39,14 +39,14 @@ struct InputChannel
 
       * `input_socket`: ZMQ Socket for receiving data
     =#
-    data::AbstractDataPacket
+    data::AbstractChannelData
     input_url::String
     input_socket::Socket
 end
 
 
 """
-    InputChannel(data_type::Type{<:AbstractDataPacket}, input_url::String;
+    InputChannel(data_type::Type{<:AbstractChannelData}, input_url::String;
                  use_bind=false)
 
 Construct an input channel that listens for input published to `input_url`
@@ -56,7 +56,7 @@ When `use_bind` is true, the ZMQ Socket that listens for messages is connected
 to `input_url` using the `bind()` method. Otherwise, the ZMQ Socket is
 connected to `input_url` using the `connect()` method.
 """
-function InputChannel(data_type::Type{<:AbstractDataPacket},
+function InputChannel(data_type::Type{<:AbstractChannelData},
                       input_url::String;
                       use_bind=false)
 

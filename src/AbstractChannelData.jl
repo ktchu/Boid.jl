@@ -1,5 +1,5 @@
 """
-AbstractDataPacket.jl defines the AbstractDataPacket type and methods
+AbstractChannelData.jl defines the AbstractChannelData type and methods
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the XYZ package. It is subject to
@@ -13,7 +13,7 @@ contained in the LICENSE file.
 
 # ------ Types
 
-export AbstractDataPacket
+export AbstractChannelData
 
 # ------ Functions
 
@@ -22,7 +22,7 @@ export encode_packet, decode_packet
 # --- Type definitions
 
 """
-    AbstractDataPacket
+    AbstractChannelData
 
 Supertype for data packet types. Concrete subtypes should
 
@@ -37,9 +37,9 @@ Interface
 
     encode_packet(data)::Vector{UInt8}
 
-    decode_packet(::Type{<:AbstractDataPacket}, bytes::Vector{UInt8})
+    decode_packet(::Type{<:AbstractChannelData}, bytes::Vector{UInt8})
 """
-abstract type AbstractDataPacket end
+abstract type AbstractChannelData end
 
 # --- Method definitions
 #
@@ -54,8 +54,8 @@ Convert data to Vector{UInt8}.
 encode_packet(data)::Vector{UInt8} = nothing
 
 """
-    decode_packet(::Type{<:AbstractDataPacket}, bytes::Vector{UInt8})
+    decode_packet(::Type{<:AbstractChannelData}, bytes::Vector{UInt8})
 
 Convert `bytes` to data.
 """
-decode_packet(::Type{<:AbstractDataPacket}, bytes::Vector{UInt8}) = nothing
+decode_packet(::Type{<:AbstractChannelData}, bytes::Vector{UInt8}) = nothing

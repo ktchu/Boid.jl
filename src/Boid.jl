@@ -13,7 +13,7 @@ contained in the LICENSE file.
 module Boid
 
 # Abstract Types
-include("AbstractDataPacket.jl")
+include("AbstractChannelData.jl")
 include("AbstractControlState.jl")
 include("AbstractProcessingCore.jl")
 

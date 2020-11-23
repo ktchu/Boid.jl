@@ -1,5 +1,5 @@
 """
-TestDataPacket.jl defines the TestDataPacket types and methods
+TestChannelData.jl defines the TestChannelData types and methods
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the XYZ package. It is subject to
@@ -13,12 +13,12 @@ contained in the LICENSE file.
 
 using Boid: Node
 
-# --- TestDataPacket
+# --- TestChannelData
 
-mutable struct TestDataPacket <: AbstractDataPacket
+mutable struct TestChannelData <: AbstractChannelData
     node::Node
     float_field::Float64
     int_field::Int
 
-    TestDataPacket() = new()
+    TestChannelData() = new()
 end
