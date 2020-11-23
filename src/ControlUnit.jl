@@ -43,28 +43,28 @@ struct ControlUnit
     state::AbstractControlState
     control_url::String
     control_socket::Socket
+end
 
-    function ControlUnit(state::AbstractControlState,
-                         control_url::String;
-                         copy_state=true,
-                         use_bind=true)
+function ControlUnit(state::AbstractControlState,
+                     control_url::String;
+                     copy_state=true,
+                     use_bind=true)
 
-        # Create Socket to listen for control signals
-        control_socket = Socket(REP)
+    # Create Socket to listen for control signals
+    control_socket = Socket(REP)
 
-        # Connect socket to URL
-        if use_bind
-            bind(control_socket, control_url)
-        else
-            connect(control_socket, control_url)
-        end
+    # Connect socket to URL
+    if use_bind
+        bind(control_socket, control_url)
+    else
+        connect(control_socket, control_url)
+    end
 
-        # Return new ControlUnit
-        if copy_state
-            new(deepcopy(state), control_url, control_socket)
-        else
-            new(state, control_url, control_socket)
-        end
+    # Return new ControlUnit
+    if copy_state
+        ControlUnit(deepcopy(state), control_url, control_socket)
+    else
+        ControlUnit(state, control_url, control_socket)
     end
 end
 
