@@ -42,30 +42,39 @@ struct OutputChannel
     data::AbstractDataPacket
     output_url::String
     output_socket::Socket
+end
 
-    """
-    TODO
-    """
-    function OutputChannel(data_type::Type{<:AbstractDataPacket},
-                           output_url::String;
-                           use_bind=true)
 
-        # Create data storage
-        data = data_type()
+"""
+    OutputChannel(data_type::Type{<:AbstractDataPacket}, output_url::String;
+                 use_bind=false)
 
-        # Create Socket to publish output data
-        output_socket = Socket(PUB)
+Construct an input channel that publishes data of type `data_type` to
+`output_url`.
 
-        # Connect socket to URL
-        if use_bind
-            bind(output_socket, output_url)
-        else
-            connect(output_socket, output_url)
-        end
+When `use_bind` is true, the ZMQ Socket that messages are published to is
+connected to `output_url` using the `bind()` method. Otherwise, the ZMQ Socket
+is connected to `output_url` using the `connect()` method.
+"""
+function OutputChannel(data_type::Type{<:AbstractDataPacket},
+                       output_url::String;
+                       use_bind=true)
 
-        # Return new ControlUnit
-        new(data, output_url, output_socket)
+    # Create data storage
+    data = data_type()
+
+    # Create Socket to publish output data
+    output_socket = Socket(PUB)
+
+    # Connect socket to URL
+    if use_bind
+        bind(output_socket, output_url)
+    else
+        connect(output_socket, output_url)
     end
+
+    # Return new ControlUnit
+    OutputChannel(data, output_url, output_socket)
 end
 
 # --- Method definitions

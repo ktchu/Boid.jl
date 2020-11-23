@@ -42,35 +42,40 @@ struct InputChannel
     data::AbstractDataPacket
     input_url::String
     input_socket::Socket
+end
 
-    # TODO: Remove
-    # Temporary constructor
-    InputChannel() = new()
 
-    """
-    TODO
-    """
-    function InputChannel(data_type::Type{<:AbstractDataPacket},
-                          input_url::String;
-                          use_bind=false)
+"""
+    InputChannel(data_type::Type{<:AbstractDataPacket}, input_url::String;
+                 use_bind=false)
 
-        # Create data storage
-        data = data_type()
+Construct an input channel that listens for input published to `input_url`
+and stores data of type `data_type`.
 
-        # Create Socket to listen for input data
-        input_socket = Socket(SUB)
-        subscribe(input_socket, "")
+When `use_bind` is true, the ZMQ Socket that listens for messages is connected
+to `input_url` using the `bind()` method. Otherwise, the ZMQ Socket is
+connected to `input_url` using the `connect()` method.
+"""
+function InputChannel(data_type::Type{<:AbstractDataPacket},
+                      input_url::String;
+                      use_bind=false)
 
-        # Connect socket to URL
-        if use_bind
-            bind(input_socket, input_url)
-        else
-            connect(input_socket, input_url)
-        end
+    # Create data storage
+    data = data_type()
 
-        # Return new ControlUnit
-        new(data, input_url, input_socket)
+    # Create Socket to listen for input data
+    input_socket = Socket(SUB)
+    subscribe(input_socket, "")
+
+    # Connect socket to URL
+    if use_bind
+        bind(input_socket, input_url)
+    else
+        connect(input_socket, input_url)
     end
+
+    # Return new ControlUnit
+    InputChannel(data, input_url, input_socket)
 end
 
 # --- Method definitions
