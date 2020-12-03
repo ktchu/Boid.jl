@@ -35,54 +35,64 @@ struct OutputChannel
       ------
       * `data`: most recently received data
 
-      * `output_url`: URL that OutputChannel publishes output data on
+      * `url`: URL that OutputChannel publishes output data on
 
-      * `output_socket`: ZMQ Socket for sending data
+      * `socket`: ZMQ Socket for sending data
     =#
     data::AbstractChannelData
-    output_url::String
-    output_socket::Socket
+    url::String
+    socket::Socket
 end
 
 
 """
-    OutputChannel(data_type::Type{<:AbstractChannelData}, output_url::String;
+    OutputChannel(data_type::Type{<:AbstractChannelData}, url::String;
                  use_bind=false)
 
-Construct an input channel that publishes data of type `data_type` to
-`output_url`.
-
+Construct an input channel that publishes data of type `data_type` to `url`.
 When `use_bind` is true, the ZMQ Socket that messages are published to is
-connected to `output_url` using the `bind()` method. Otherwise, the ZMQ Socket
-is connected to `output_url` using the `connect()` method.
+connected to `url` using the `bind()` method. Otherwise, the ZMQ Socket is
+connected to `url` using the `connect()` method.
 """
 function OutputChannel(data_type::Type{<:AbstractChannelData},
-                       output_url::String;
+                       url::String;
                        use_bind=true)
 
     # Create data storage
     data = data_type()
 
     # Create Socket to publish output data
-    output_socket = Socket(PUB)
+    socket = Socket(PUB)
 
     # Connect socket to URL
     if use_bind
-        bind(output_socket, output_url)
+        bind(socket, url)
     else
-        connect(output_socket, output_url)
+        connect(socket, url)
     end
 
     # Return new ControlUnit
-    OutputChannel(data, output_url, output_socket)
+    OutputChannel(data, url, socket)
 end
 
 # --- Method definitions
 
-function publish(output_channel::OutputChannel)
+"""
+    TODO
+"""
+function publish(channel::OutputChannel, data)
     # Encode data
-    encoded_data = encode_data(output_channel.data)
+    bytes = encode_data(typeof(channel.data), data)
 
-    # Send output data
-    send(output_channel.output_socket, encoded_data)
+    # Send outgoing data
+    send(channel.socket, bytes)
+
+    # Update most recent data sent
+    set_current_value!(channel.data, data)
 end
+
+"""
+    TODO
+"""
+get_current_value(channel::OutputChannel) =
+    get_current_value(channel.data)
