@@ -75,7 +75,7 @@ end
     # Start run()
     @async run(control_unit)
 
-    # Sent START signal
+    # Send START signal
     socket = Socket(REQ)
     connect(socket, control_url)
     send(socket, START)
@@ -84,7 +84,7 @@ end
     @test control_unit.state.count == 0
     @test response == "SUCCESS"
 
-    # Sent STOP signal
+    # Send STOP signal
     socket = Socket(REQ)
     connect(socket, control_url)
     send(socket, STOP)
@@ -93,7 +93,7 @@ end
     @test control_unit.state.count == 0
     @test response == "SUCCESS"
 
-    # Sent INCREMENT signal
+    # Send INCREMENT signal
     socket = Socket(REQ)
     connect(socket, control_url)
     send(socket, INCREMENT)
@@ -102,7 +102,7 @@ end
     @test control_unit.state.count == 1
     @test response == "SUCCESS"
 
-    # Sent unknown signal
+    # Send unknown signal
     socket = Socket(REQ)
     connect(socket, control_url)
     send(socket, 100)
