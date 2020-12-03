@@ -26,20 +26,20 @@ end
 
 # --- Method definitions
 
-Boid.get_current_value(channel_data::AbstractChannelData) =
+Boid.get_current_value(channel_data::TestChannelData) =
     channel_data.current_value
 
-function Boid.set_current_value!(channel_data::AbstractChannelData, value)
+function Boid.set_current_value!(channel_data::TestChannelData, value)
     channel_data.current_value = value
 end
 
-function Boid.encode_data(::Type{<:AbstractChannelData}, data)::Vector{UInt8}
+function Boid.encode_data(::Type{TestChannelData}, data)::Vector{UInt8}
     packed_data = IOBuffer()
     serialize(packed_data, data)
     return take!(packed_data)
 end
 
-function Boid.decode_data(::Type{<:AbstractChannelData}, bytes::Vector{UInt8})
+function Boid.decode_data(::Type{TestChannelData}, bytes::Vector{UInt8})
     packed_data = IOBuffer()
     write(packed_data, bytes)
     return deserialize(seekstart(packed_data))
