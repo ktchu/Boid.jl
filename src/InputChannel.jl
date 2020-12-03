@@ -17,11 +17,12 @@ export InputChannel
 
 # ------ Functions
 
-export listen, process_message
+export listen, loop_listen, get_last_value
 
 # --- Type definitions
 
 using ZMQ
+include("InputChannelState.jl")
 
 """
     struct InputChannel
@@ -33,15 +34,18 @@ struct InputChannel
     #=
       Fields
       ------
-      * `data`: most recently received data
-
       * `url`: URL that InputChannel listens for input data on
 
       * `socket`: ZMQ Socket for receiving data
+
+      * `state`: current state of channel
+
+      * `data`: most recently received data
     =#
-    data::AbstractChannelData
     url::String
     socket::Socket
+    state::InputChannelState
+    data::AbstractChannelData
 end
 
 
@@ -59,10 +63,6 @@ to `url` using the `bind()` method. Otherwise, the ZMQ Socket is connected to
 function InputChannel(data_type::Type{<:AbstractChannelData},
                       url::String;
                       use_bind=false)
-
-    # Create data storage
-    data = data_type()
-
     # Create Socket to listen for input data
     socket = Socket(SUB)
     subscribe(socket, "")
@@ -74,47 +74,62 @@ function InputChannel(data_type::Type{<:AbstractChannelData},
         connect(socket, url)
     end
 
+    # Create channel state
+    state = InputChannelState()
+
+    # Create data storage
+    data = data_type()
+
     # Return new ControlUnit
-    InputChannel(data, url, socket)
+    InputChannel(url, socket, state, data)
 end
 
 # --- Method definitions
 
 """
-    get_current_value(channel::InputChannel)
+    listen(channel::InputChannel)
 
-Return most recent data value received by `channel`.
+Listen for incoming message on `channel`.
+
+Notes
+-----
+* It is often useful to call `listen()` within an asynchronous Task.
 """
-get_current_value(channel::InputChannel) = get_current_value(channel.data)
+function listen(channel::InputChannel)
+    # Preparations
+    message = nothing  # initialized so that it is available outside of Task
+
+    # Listen for incoming message
+    task = @task message = recv(channel.socket, Vector{UInt8})
+    schedule(task)
+
+    # Update state
+    channel.state.is_listening = true
+
+    # Wait for message to arrive
+    wait(task)
+
+    # Update channel data
+    set_data!(channel.data, message, decode=true)
+
+    # Update state
+    channel.state.is_listening = false
+end
 
 """
-    start(channel::InputChannel)
+    loop_listen(channel::InputChannel)
 
-Start listen-process loop for `channel`.
+Start continuous listening loop for `channel`.
 """
-function start(channel::InputChannel)
+function loop_listen(channel::InputChannel)
     while true
-        message = listen(channel)
-        process_message(channel, message)
+        @async listen(channel)
     end
 end
 
 """
-    listen(channel::InputChannel)
+    get_last_value(channel::InputChannel)
 
-Listen for the next message on `channel`.
+Return the most recent data value received by `channel`.
 """
-listen(channel::InputChannel) = recv(channel.socket, Vector{UInt8})
-
-"""
-    process_message(channel::InputChannel, message)
-
-Decoded `message` and decoded value to update `channel` data.
-"""
-function process_message(channel::InputChannel, message)
-    # Decode data
-    data = decode_data(typeof(channel.data), message)
-
-    # Update most recent data received
-    set_current_value!(channel.data, data)
-end
+get_last_value(channel::InputChannel) = get_data(channel.data)

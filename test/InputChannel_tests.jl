@@ -61,62 +61,29 @@ end
     bind(socket, input_url)
 
     # Get initial value of input channel data
-    initial_channel_value = get_current_value(input_channel)
-
-    # Initialize message received so that it is available outside of the
-    # tasks.
-    message_received = nothing
+    initial_channel_value = get_last_value(input_channel)
 
     # --- Tests
 
     # Start listnening for input data
-    # task = @task message_received = listen(input_channel)
-    # schedule(task)
-    # sleep(0.1)  # give task time to start
+    @async listen(input_channel)
+    while !input_channel.state.is_listening
+        sleep(0.1)
+    end
+    @test input_channel.state.is_listening
 
     # Send value
-    data = rand()
-    while data == initial_channel_value
-        data = rand()
+    data_sent = rand()
+    while data_sent == initial_channel_value
+        data_sent = rand()
     end
-    message_sent = encode_data(TestChannelData, data)
-    send(socket, message_sent)
+    send(socket, encode_data(TestChannelData, data_sent))
 
-    # wait(task)
-
-    # --- Clean up
-    _tearDown()
-end
-
-@testset "InputChannel: process_message()" begin
-    # --- Preparations
-
-    # Create InputChannel
-    input_channel = InputChannel(TestChannelData, input_url, use_bind=false)
-
-    # Get initial value of input channel data
-    initial_channel_value = get_current_value(input_channel)
-
-    # --- Tests
-
-    # Process data value
-    data = rand()
-    while data == initial_channel_value
-        data = rand()
+    while input_channel.state.is_listening
+        sleep(0.1)
     end
-    message = encode_data(TestChannelData, data)
-    process_message(input_channel, message)
-    @test get_current_value(input_channel) == data
-
-    # Process another data value
-    initial_channel_value = data
-    data = rand()
-    while data == initial_channel_value
-        data = rand()
-    end
-    message = encode_data(TestChannelData, data)
-    process_message(input_channel, message)
-    @test get_current_value(input_channel) == data
+    @test get_last_value(input_channel) == data_sent
+    @test !input_channel.state.is_listening
 
     # --- Clean up
     _tearDown()
