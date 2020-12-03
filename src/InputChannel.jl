@@ -17,7 +17,7 @@ export InputChannel
 
 # ------ Functions
 
-export listen
+export listen, process_message
 
 # --- Type definitions
 
@@ -35,58 +35,86 @@ struct InputChannel
       ------
       * `data`: most recently received data
 
-      * `input_url`: URL that InputChannel listens for input data on
+      * `url`: URL that InputChannel listens for input data on
 
-      * `input_socket`: ZMQ Socket for receiving data
+      * `socket`: ZMQ Socket for receiving data
     =#
     data::AbstractChannelData
-    input_url::String
-    input_socket::Socket
+    url::String
+    socket::Socket
 end
 
 
 """
-    InputChannel(data_type::Type{<:AbstractChannelData}, input_url::String;
+    InputChannel(data_type::Type{<:AbstractChannelData}, url::String;
                  use_bind=false)
 
-Construct an input channel that listens for input published to `input_url`
-and stores data of type `data_type`.
+Construct an input channel that listens for input published to `url` and stores
+data of type `data_type`.
 
 When `use_bind` is true, the ZMQ Socket that listens for messages is connected
-to `input_url` using the `bind()` method. Otherwise, the ZMQ Socket is
-connected to `input_url` using the `connect()` method.
+to `url` using the `bind()` method. Otherwise, the ZMQ Socket is connected to
+`url` using the `connect()` method.
 """
 function InputChannel(data_type::Type{<:AbstractChannelData},
-                      input_url::String;
+                      url::String;
                       use_bind=false)
 
     # Create data storage
     data = data_type()
 
     # Create Socket to listen for input data
-    input_socket = Socket(SUB)
-    subscribe(input_socket, "")
+    socket = Socket(SUB)
+    subscribe(socket, "")
 
     # Connect socket to URL
     if use_bind
-        bind(input_socket, input_url)
+        bind(socket, url)
     else
-        connect(input_socket, input_url)
+        connect(socket, url)
     end
 
     # Return new ControlUnit
-    InputChannel(data, input_url, input_socket)
+    InputChannel(data, url, socket)
 end
 
 # --- Method definitions
 
-function listen(input_channel::InputChannel)
-    # Wait for input data
-    message = recv(input_channel.input_socket, Vector{UInt8})
+"""
+    get_current_value(channel::InputChannel)
 
+Return most recent data value received by `channel`.
+"""
+get_current_value(channel::InputChannel) = get_current_value(channel.data)
+
+"""
+    start(channel::InputChannel)
+
+Start listen-process loop for `channel`.
+"""
+function start(channel::InputChannel)
+    while true
+        message = listen(channel)
+        process_message(channel, message)
+    end
+end
+
+"""
+    listen(channel::InputChannel)
+
+Listen for the next message on `channel`.
+"""
+listen(channel::InputChannel) = recv(channel.socket, Vector{UInt8})
+
+"""
+    process_message(channel::InputChannel, message)
+
+Decoded `message` and decoded value to update `channel` data.
+"""
+function process_message(channel::InputChannel, message)
     # Decode data
-    decode_input_data(typeof(input_channel.data), message)
+    data = decode_data(typeof(channel.data), message)
 
-    # Restart input_channel
-    @async listen(input_channel)
+    # Update most recent data received
+    set_current_value!(channel.data, data)
 end
