@@ -13,12 +13,13 @@ contained in the LICENSE file.
 
 using Boid: AbstractControlState
 
-# --- TestControlState
+# --- Type definitions
 
 mutable struct TestControlState <: AbstractControlState
     is_running::Bool
     count::Int
 
+    # Default constructor
     function TestControlState()
         is_running = false
         count = 0
@@ -31,6 +32,8 @@ end
     STOP
     INCREMENT
 end
+
+# --- Method definitions
 
 function Boid.decode_control_signal(::Type{TestControlState},
                                     bytes::Vector{UInt8})

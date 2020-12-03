@@ -13,7 +13,9 @@ contained in the LICENSE file.
 
 using Boid: AbstractProcessingCore
 
-# --- TestProcessingCore
+# --- Type definitions
 
 mutable struct TestProcessingCore <: AbstractProcessingCore
+    # Default constructor
+    TestProcessingCore() = new()
 end
