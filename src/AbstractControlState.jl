@@ -40,7 +40,6 @@ Interface
 
 Common Signals to Support
 -------------------------
-
 * Request for the output type. To support this signal, include the Node or
   OutputChannel as a field in the concrete subtype.
 """
