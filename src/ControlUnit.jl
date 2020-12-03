@@ -35,36 +35,44 @@ struct ControlUnit
       ------
       * `state`: operational state
 
-      * `control_url`: URL that ControlUnit listens for control signals on
+      * `url`: URL that ControlUnit listens for control signals on
 
-      * `control_socket`: ZMQ Socket for receiving control signals and
+      * `socket`: ZMQ Socket for receiving control signals and
                           returning status
     =#
     state::AbstractControlState
-    control_url::String
-    control_socket::Socket
+    url::String
+    socket::Socket
 end
 
+"""
+    ControlUnit(state::AbstractControlState,
+                url::String;
+                copy_state=true,
+                use_bind=true)
+
+Construct a control unit ... TODO
+"""
 function ControlUnit(state::AbstractControlState,
-                     control_url::String;
+                     url::String;
                      copy_state=true,
                      use_bind=true)
 
     # Create Socket to listen for control signals
-    control_socket = Socket(REP)
+    socket = Socket(REP)
 
     # Connect socket to URL
     if use_bind
-        bind(control_socket, control_url)
+        bind(socket, url)
     else
-        connect(control_socket, control_url)
+        connect(socket, url)
     end
 
     # Return new ControlUnit
     if copy_state
-        ControlUnit(deepcopy(state), control_url, control_socket)
+        ControlUnit(deepcopy(state), url, socket)
     else
-        ControlUnit(state, control_url, control_socket)
+        ControlUnit(state, url, socket)
     end
 end
 
@@ -72,7 +80,7 @@ end
 
 function run(control_unit::ControlUnit)
     # Wait for control signal
-    message = recv(control_unit.control_socket, Vector{UInt8})
+    message = recv(control_unit.socket, Vector{UInt8})
     control_signal = decode_control_signal(typeof(control_unit.state),
                                            message)
 
@@ -87,7 +95,7 @@ function run(control_unit::ControlUnit)
     if isnothing(response)
         response = ""
     end
-    send(control_unit.control_socket, response)
+    send(control_unit.socket, response)
 
     # Restart control unit
     @async run(control_unit)
