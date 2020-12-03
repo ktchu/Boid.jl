@@ -28,25 +28,25 @@ end
 
 Boid.get_data(channel_data::TestChannelData; encode::Bool=false) =
     encode ?
-        encode_data(TestChannelData, channel_data.data) :
+        encode_value(TestChannelData, channel_data.data) :
         channel_data.data
 
 function Boid.set_data!(channel_data::TestChannelData, value;
                         decode::Bool=false)
     if decode
-        channel_data.data = decode_data(TestChannelData, value)
+        channel_data.data = decode_value(TestChannelData, value)
     else
         channel_data.data = value
     end
 end
 
-function Boid.encode_data(::Type{TestChannelData}, data)::Vector{UInt8}
+function Boid.encode_value(::Type{TestChannelData}, data)::Vector{UInt8}
     packed_data = IOBuffer()
     serialize(packed_data, data)
     return take!(packed_data)
 end
 
-function Boid.decode_data(::Type{TestChannelData}, bytes::Vector{UInt8})
+function Boid.decode_value(::Type{TestChannelData}, bytes::Vector{UInt8})
     packed_data = IOBuffer()
     write(packed_data, bytes)
     return deserialize(seekstart(packed_data))

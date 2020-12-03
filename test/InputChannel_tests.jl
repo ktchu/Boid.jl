@@ -77,7 +77,7 @@ end
     while data_sent == initial_channel_value
         data_sent = rand()
     end
-    send(socket, encode_data(TestChannelData, data_sent))
+    send(socket, encode_value(TestChannelData, data_sent))
 
     while input_channel.state.is_listening
         sleep(0.1)

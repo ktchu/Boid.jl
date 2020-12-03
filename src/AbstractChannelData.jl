@@ -18,7 +18,7 @@ export AbstractChannelData
 # ------ Functions
 
 export get_data, set_data!
-export encode_data, decode_data
+export encode_value, decode_value
 
 # --- Type definitions
 
@@ -39,9 +39,9 @@ Interface
 
     set_data!(channel_data::AbstractChannelData, value)
 
-    encode_data(::Type{<:AbstractChannelData}, data)::Vector{UInt8}
+    encode_value(::Type{<:AbstractChannelData}, data)::Vector{UInt8}
 
-    decode_data(::Type{<:AbstractChannelData}, bytes::Vector{UInt8})
+    decode_value(::Type{<:AbstractChannelData}, bytes::Vector{UInt8})
 """
 abstract type AbstractChannelData end
 
@@ -54,7 +54,7 @@ abstract type AbstractChannelData end
     get_data(channel_data::AbstractChannelData; encode::Bool=false)
 
 Return the data value stored by `channel_data`. When `encode` is true, the data
-value is encoded as a byte vector using the `encode_data()` function before
+value is encoded as a byte vector using the `encode_value()` function before
 being returned. When `encode` is false, the data value is returned directly.
 """
 get_data(channel_data::AbstractChannelData; encode::Bool=false) = nothing
@@ -63,22 +63,22 @@ get_data(channel_data::AbstractChannelData; encode::Bool=false) = nothing
     set_data!(channel_data::AbstractChannelData, value; decode::Bool=false)
 
 Set the data stored by `channel_data` to `value`. When `decode` is true,
-`value` is intepreted as a byte vector and decoded using the `decode_data()`
+`value` is intepreted as a byte vector and decoded using the `decode_value()`
 function before being stored. When `decode` is false, `value` is stored as-is.
 """
 set_data!(channel_data::AbstractChannelData, value; decode::Bool=false) =
     nothing
 
 """
-    encode_data(value)::Vector{UInt8}
+    encode_value(value)::Vector{UInt8}
 
 Encode `value` as a byte vector.
 """
-encode_data(::Type{<:AbstractChannelData}, value)::Vector{UInt8} = nothing
+encode_value(::Type{<:AbstractChannelData}, value)::Vector{UInt8} = nothing
 
 """
-    decode_data(::Type{<:AbstractChannelData}, bytes::Vector{UInt8})
+    decode_value(::Type{<:AbstractChannelData}, bytes::Vector{UInt8})
 
 Convert `bytes` to a value.
 """
-decode_data(::Type{<:AbstractChannelData}, bytes::Vector{UInt8}) = nothing
+decode_value(::Type{<:AbstractChannelData}, bytes::Vector{UInt8}) = nothing
