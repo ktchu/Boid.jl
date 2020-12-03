@@ -17,27 +17,31 @@ export AbstractChannelData
 
 # ------ Functions
 
-export encode_packet, decode_packet
+export get_data, set_data!
+export encode_data, decode_data
 
 # --- Type definitions
 
 """
     AbstractChannelData
 
-Supertype for data packet types. Concrete subtypes should
+Supertype for channel data types. Concrete subtypes should
 
 * possess a default constructor with no arguments and
 
 * be mutable or contain mutable fields so that they can be modified to
-  represent the most recent data contained in an InputChannel or
-  OutputChannel.
+  represent the most recent data sent or received by a data channel.
 
 Interface
 =========
 
-    encode_packet(data)::Vector{UInt8}
+    get_data(channel_data::AbstractChannelData)
 
-    decode_packet(::Type{<:AbstractChannelData}, bytes::Vector{UInt8})
+    set_data!(channel_data::AbstractChannelData, value)
+
+    encode_data(::Type{<:AbstractChannelData}, data)::Vector{UInt8}
+
+    decode_data(::Type{<:AbstractChannelData}, bytes::Vector{UInt8})
 """
 abstract type AbstractChannelData end
 
@@ -47,15 +51,34 @@ abstract type AbstractChannelData end
 #       a central location for docstrings.
 
 """
-    encode_packet(data)::Vector{UInt8}
+    get_data(channel_data::AbstractChannelData; encode::Bool=false)
 
-Convert data to Vector{UInt8}.
+Return the data value stored by `channel_data`. When `encode` is true, the data
+value is encoded as a byte vector using the `encode_data()` function before
+being returned. When `encode` is false, the data value is returned directly.
 """
-encode_packet(data)::Vector{UInt8} = nothing
+get_data(channel_data::AbstractChannelData; encode::Bool=false) = nothing
 
 """
-    decode_packet(::Type{<:AbstractChannelData}, bytes::Vector{UInt8})
+    set_data!(channel_data::AbstractChannelData, value; decode::Bool=false)
 
-Convert `bytes` to data.
+Set the data stored by `channel_data` to `value`. When `decode` is true,
+`value` is intepreted as a byte vector and decoded using the `decode_data()`
+function before being stored. When `decode` is false, `value` is stored as-is.
 """
-decode_packet(::Type{<:AbstractChannelData}, bytes::Vector{UInt8}) = nothing
+set_data!(channel_data::AbstractChannelData, value; decode::Bool=false) =
+    nothing
+
+"""
+    encode_data(value)::Vector{UInt8}
+
+Encode `value` as a byte vector.
+"""
+encode_data(::Type{<:AbstractChannelData}, value)::Vector{UInt8} = nothing
+
+"""
+    decode_data(::Type{<:AbstractChannelData}, bytes::Vector{UInt8})
+
+Convert `bytes` to a value.
+"""
+decode_data(::Type{<:AbstractChannelData}, bytes::Vector{UInt8}) = nothing
