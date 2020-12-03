@@ -17,7 +17,7 @@ export OutputChannel
 
 # ------ Functions
 
-export publish
+export publish, get_last_value
 
 # --- Type definitions
 
@@ -33,7 +33,7 @@ struct OutputChannel
     #=
       Fields
       ------
-      * `data`: most recently received data
+      * `data`: most recently sent data
 
       * `url`: URL that OutputChannel publishes output data on
 
@@ -49,7 +49,7 @@ end
     OutputChannel(data_type::Type{<:AbstractChannelData}, url::String;
                  use_bind=false)
 
-Construct an input channel that publishes data of type `data_type` to `url`.
+Construct an output channel that publishes data of type `data_type` to `url`.
 When `use_bind` is true, the ZMQ Socket that messages are published to is
 connected to `url` using the `bind()` method. Otherwise, the ZMQ Socket is
 connected to `url` using the `connect()` method.
@@ -78,21 +78,22 @@ end
 # --- Method definitions
 
 """
-    TODO
+    publish(channel::OutputChannel, value)
+
+Publish `value` to `channel`.
 """
-function publish(channel::OutputChannel, data)
-    # Encode data
-    bytes = encode_data(typeof(channel.data), data)
+function publish(channel::OutputChannel, value)
+    # Encode value and send message
+    message = encode_value(typeof(channel.data), value)
+    send(channel.socket, message)
 
-    # Send outgoing data
-    send(channel.socket, bytes)
-
-    # Update most recent data sent
-    set_current_value!(channel.data, data)
+    # Update channel data
+    set_data!(channel.data, data, decode=false)
 end
 
 """
-    TODO
+    get_last_value(channel::OutputChannel)
+
+Return the most recent data value sent by `channel`.
 """
-get_current_value(channel::OutputChannel) =
-    get_current_value(channel.data)
+get_last_value(channel::OutputChannel) = get_data(channel.data)
