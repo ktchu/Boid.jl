@@ -57,7 +57,7 @@ using Boid
 
     ipc_dir = "invalid://ipc:///path/to/ipc/dir"
     ipc_name = "ipc-name"
-    expected_message = """Invalid `ipc_dir` "$(ipc_dir)"."""
+    expected_message = """Invalid `ipc_dir` "$ipc_dir"."""
     @test_throws(ArgumentError(expected_message),
                  construct_ipc_url(ipc_dir, ipc_name))
 end
