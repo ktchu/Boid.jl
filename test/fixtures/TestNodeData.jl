@@ -1,6 +1,5 @@
 """
-The Boid.jl module defines types and functions to support autonomous,
-distributed computing/processing.
+TestNodeData.jl defines the TestNodeData types and methods
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the XYZ package. It is subject to
@@ -10,23 +9,16 @@ copied, modified, propagated, or distributed except according to the terms
 contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
-module Boid
+# --- Imports
 
-# Abstract Types
-include("AbstractChannelData.jl")
-include("AbstractControlState.jl")
-include("AbstractNodeData.jl")
-include("AbstractProcessingCore.jl")
+using Boid: AbstractNodeData
 
-# Concrete Types
-include("InputChannel.jl")
-include("OutputChannel.jl")
+# --- Type definitions
 
-include("ControlUnit.jl")
+mutable struct TestNodeData <: AbstractNodeData
+    field_1::Float64
+    field_2::Int
 
-include("Node.jl")
-
-# Methods
-include("utils.jl")
-
-end  # End of Boid.jl module
+    # Default constructor
+    TestNodeData() = new()
+end

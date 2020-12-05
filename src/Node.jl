@@ -36,28 +36,29 @@ struct Node
 
         * `id`: id
 
-      * __Components__
-
-        * `control_unit`: control unit
+      * __Processing Components__
 
         * `processing_core`: processing core
 
-      * __Communication Channels__
+        * `data`: data storage
 
-      * `output_url`: URL that Nodes publishes outputs to
+      * __Node Operation Components__
 
-      * `output_channel`: channel for publishing output
+        * `control_unit`: control unit
 
-      * `input_urls`: URLs that Nodes listens for inputs on
+        * `output_channel`: channel for publishing output
 
-      * `input_channels`: channels for listening for inputs
+        * `input_channels`: channels for listening for inputs
     =#
 
     # Attributes
     id::String
 
-    # Components
+    # Processing Components
     processing_core::AbstractProcessingCore
+    data::AbstractNodeData
+
+    # Node Operation Components
     control_unit::ControlUnit
     output_channel::OutputChannel
     input_channels::Vector{InputChannel}
@@ -68,6 +69,7 @@ end
 """
     Node(id::String,
          processing_core::AbstractProcessingCore,
+         data_type::Type{<:AbstractNodeData},
          control_unit_params::Dict,
          output_channel_params::Dict,
          input_channel_params::Vector{Dict})
@@ -116,6 +118,7 @@ unit, output channel, and input channels, respectively.
 """
 function Node(id::String,
               processing_core::AbstractProcessingCore,
+              data_type::Type{<:AbstractNodeData},
               control_unit_params::Dict,
               output_channel_params::Dict,
               input_channel_params::Vector{Dict})
@@ -123,15 +126,43 @@ function Node(id::String,
     # --- Check arguments
 
     # Check for required parameters for control unit
-    # TODO
+    required_params = ["state", "url"]
+    for param in required_params
+        if !haskey(control_unit_params, param)
+            message = "`control_unit_params` is missing required parameter: " *
+                      "`$param`"
+            throw(ArgumentError(message))
+        end
+    end
 
     # Check for required parameters for output channel
-    # TODO
+    required_params = ["data_type", "url"]
+    for param in required_params
+        if !haskey(output_channel_params, param)
+            message =
+                "`output_channel_params` is missing required parameter: " *
+                "`$param`"
+            throw(ArgumentError(message))
+        end
+    end
 
     # Check for required parameters for input channels
-    # TODO
+    required_params = ["data_type", "url"]
+    for i in 1:length(input_channel_params)
+        for param in required_params
+            if !haskey(input_channel_params[i], param)
+                message =
+                    "`input_channel_params[$i]` is missing required " *
+                    "parameter: `$param`"
+                throw(ArgumentError(message))
+            end
+        end
+    end
 
     # --- Construct components
+
+    # Construct data
+    data = data_type()
 
     # Construct control unit
     control_unit =
@@ -159,8 +190,8 @@ function Node(id::String,
 
     # --- Construct new Node
 
-    node = Node(id, processing_core, control_unit,
-                output_channel, input_channels)
+    node = Node(id, processing_core, data,
+                control_unit, output_channel, input_channels)
 end
 
 # --- Method definitions
@@ -174,8 +205,6 @@ function run(node::Node)
         @async listen(channel)
     end
 
-    # Start control unit
-
-    # Restart control unit
-    @async run(control_unit)
+    # Run main processing loop
+    # TODO
 end

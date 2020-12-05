@@ -25,6 +25,7 @@ using Boid
 # Concrete subtypes of abstract types
 include("fixtures/TestChannelData.jl")
 include("fixtures/TestControlState.jl")
+include("fixtures/TestNodeData.jl")
 include("fixtures/TestProcessingCore.jl")
 
 # Constants
@@ -57,7 +58,7 @@ function _tearDown()
     end
 end
 
-# --- Constructor tests
+# --- Tests
 
 @testset "Node: constructor" begin
     # --- Preparations
@@ -85,11 +86,112 @@ end
 
     # --- Tests
 
-    node = Node(id, processing_core,
+    # ------- Normal usage
+
+    node = Node(id, processing_core, TestNodeData,
                 control_unit_params,
                 output_channel_params,
                 input_channel_params)
 
+    @test node.control_unit isa ControlUnit
+
+    # TODO: add tests
+
+    # ------ Error cases
+
+    # Invalid `control_unit_params`
+    required_params = ["state", "url"]
+    for param in required_params
+        invalid_control_unit_params = copy(control_unit_params)
+        delete!(invalid_control_unit_params, param)
+        expected_message =
+            "`control_unit_params` is missing required parameter: `$param`"
+        @test_throws(ArgumentError(expected_message),
+                     Node(id, processing_core, TestNodeData,
+                          invalid_control_unit_params,
+                          output_channel_params,
+                          input_channel_params))
+    end
+
+    # Invalid `output_channel_params`
+    required_params = ["data_type", "url"]
+    for param in required_params
+        invalid_output_channel_params = copy(output_channel_params)
+        delete!(invalid_output_channel_params, param)
+        expected_message =
+            "`output_channel_params` is missing required parameter: `$param`"
+        @test_throws(ArgumentError(expected_message),
+                     Node(id, processing_core, TestNodeData,
+                          control_unit_params,
+                          invalid_output_channel_params,
+                          input_channel_params))
+    end
+
+    # Invalid `input_channel_params`
+    required_params = ["data_type", "url"]
+    for i in 1:length(input_channel_params)
+        for param in required_params
+            invalid_input_channel_params = deepcopy(input_channel_params)
+            delete!(invalid_input_channel_params[i], param)
+            expected_message =
+            "`input_channel_params[$i]` is missing required parameter: `$param`"
+            @test_throws(ArgumentError(expected_message),
+                         Node(id, processing_core, TestNodeData,
+                              control_unit_params,
+                              output_channel_params,
+                              invalid_input_channel_params))
+        end
+    end
+
     # --- Clean up
+
+    _tearDown()
+end
+
+@testset "Node: run()" begin
+    # --- Preparations
+
+    id = "node-1"
+
+    processing_core = TestProcessingCore()
+
+    control_unit_params = Dict(
+        "state"=>TestControlState(),
+        "url"=>control_url,
+        "copy_state"=>false)
+
+    output_channel_params = Dict(
+        "url"=>output_url,
+        "data_type"=>TestChannelData)
+
+    input_channel_params = Vector{Dict}()
+    for input_url in input_urls
+        push!(input_channel_params,
+              Dict(
+                "url"=>input_url,
+                "data_type"=>TestChannelData))
+    end
+
+    # Construct Node
+    node = Node(id, processing_core, TestNodeData,
+                control_unit_params,
+                output_channel_params,
+                input_channel_params)
+
+    # --- Tests
+
+    # Start node
+    run(node)
+
+    # Check state of input channels
+    for channel in node.input_channels
+        while !channel.state.is_listening
+            sleep(0.1)
+        end
+        @test channel.state.is_listening
+    end
+
+    # --- Clean up
+
     _tearDown()
 end

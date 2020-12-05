@@ -1,6 +1,5 @@
 """
-The Boid.jl module defines types and functions to support autonomous,
-distributed computing/processing.
+AbstractNodeData.jl defines the AbstractNodeData type and methods
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the XYZ package. It is subject to
@@ -10,23 +9,24 @@ copied, modified, propagated, or distributed except according to the terms
 contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
-module Boid
+# --- Exports
 
-# Abstract Types
-include("AbstractChannelData.jl")
-include("AbstractControlState.jl")
-include("AbstractNodeData.jl")
-include("AbstractProcessingCore.jl")
+# ------ Types
 
-# Concrete Types
-include("InputChannel.jl")
-include("OutputChannel.jl")
+export AbstractNodeData
 
-include("ControlUnit.jl")
+# ------ Functions
 
-include("Node.jl")
+# --- Type definitions
 
-# Methods
-include("utils.jl")
+"""
+    AbstractNodeData
 
-end  # End of Boid.jl module
+Supertype for node data types. Concrete subtypes should
+
+* possess a default constructor with no arguments and
+
+* be mutable or contain mutable fields so that they can be modified as the
+  node processes input.
+"""
+abstract type AbstractNodeData end
