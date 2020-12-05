@@ -47,6 +47,7 @@ end
     @test input_channel.socket isa Socket
 
     # --- Clean up
+
     _tearDown()
 end
 
@@ -86,5 +87,6 @@ end
     @test !input_channel.state.is_listening
 
     # --- Clean up
+
     _tearDown()
 end

@@ -61,6 +61,7 @@ end
     @test control_unit.socket isa Socket
 
     # --- Clean up
+
     _tearDown()
 end
 
@@ -110,5 +111,6 @@ end
     @test response == get_exception_signal(TestControlState)
 
     # --- Clean up
+
     _tearDown()
 end
