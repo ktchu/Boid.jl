@@ -35,7 +35,7 @@ function _tearDown()
     rm(input_ipc_path, force=true)
 end
 
-# --- Constructor tests
+# --- Tests
 
 @testset "InputChannel: constructor" begin
     # --- Tests

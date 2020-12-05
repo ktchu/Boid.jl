@@ -35,7 +35,7 @@ function _tearDown()
     rm(control_ipc_path, force=true)
 end
 
-# --- Constructor tests
+# --- Tests
 
 @testset "ControlUnit: constructor" begin
     # --- Preparations
