@@ -26,36 +26,37 @@ using ZMQ
 """
     struct ControlUnit
 
-Component that listens for and processes control signals. The `state` field
-stores the current state of the processing unit.
+Component that listens for and processes control signals. The `logic_unit`
+field (1) provides methods to handle control signals and (2) stores the
+current control state (if any).
 """
 struct ControlUnit
     #=
       Fields
       ------
-      * `state`: operational state
+      * `logic_unit`: control logic unit
 
       * `url`: URL that ControlUnit listens for control signals on
 
       * `socket`: ZMQ Socket for receiving control signals and
                           returning status
     =#
-    state::AbstractControlState
+    logic_unit::AbstractControlLogicUnit
     url::String
     socket::Socket
 end
 
 """
-    ControlUnit(state::AbstractControlState,
+    ControlUnit(logic_unit::AbstractControlLogicUnit,
                 url::String;
-                copy_state=true,
+                copy_logic_unit=true,
                 use_bind=true)
 
 Construct a control unit ... TODO
 """
-function ControlUnit(state::AbstractControlState,
+function ControlUnit(logic_unit::AbstractControlLogicUnit,
                      url::String;
-                     copy_state=true,
+                     copy_logic_unit=true,
                      use_bind=true)
 
     # Create Socket to listen for control signals
@@ -69,10 +70,10 @@ function ControlUnit(state::AbstractControlState,
     end
 
     # Return new ControlUnit
-    if copy_state
-        ControlUnit(deepcopy(state), url, socket)
+    if copy_logic_unit
+        ControlUnit(deepcopy(logic_unit), url, socket)
     else
-        ControlUnit(state, url, socket)
+        ControlUnit(logic_unit, url, socket)
     end
 end
 
@@ -81,14 +82,15 @@ end
 function run(control_unit::ControlUnit)
     # Wait for control signal
     message = recv(control_unit.socket, Vector{UInt8})
-    control_signal = decode_control_signal(typeof(control_unit.state),
+    control_signal = decode_control_signal(typeof(control_unit.logic_unit),
                                            message)
 
     # Process control signal
     try
-        response = process_control_signal!(control_unit.state, control_signal)
+        response = process_control_signal!(control_unit.logic_unit,
+                                           control_signal)
     catch
-        response = get_exception_signal(typeof(control_unit.state))
+        response = get_exception_signal(typeof(control_unit.logic_unit))
     end
 
     # Send response

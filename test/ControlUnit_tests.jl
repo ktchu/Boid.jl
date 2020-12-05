@@ -22,8 +22,8 @@ using Boid
 
 # --- Test fixtures
 
-# Concrete subtype of AbstractControlState
-include("fixtures/TestControlState.jl")
+# Concrete subtype of AbstractControlLogicUnit
+include("fixtures/TestControlLogicUnit.jl")
 
 # Constants
 control_url = construct_ipc_url(".", "control-unit-test.zmq")
@@ -40,23 +40,23 @@ end
 @testset "ControlUnit: constructor" begin
     # --- Preparations
 
-    state = TestControlState()
+    logic_unit = TestControlLogicUnit()
 
     # --- Tests
 
-    # copy_state == true
-    control_unit = ControlUnit(state, control_url)
+    # copy_logic_unit == true
+    control_unit = ControlUnit(logic_unit, control_url)
 
-    @test control_unit.state isa TestControlState
-    @test control_unit.state !== state
+    @test control_unit.logic_unit isa TestControlLogicUnit
+    @test control_unit.logic_unit !== logic_unit
     @test control_unit.url == control_url
     @test control_unit.socket isa Socket
 
-    # copy_state == false
-    control_unit = ControlUnit(state, control_url, copy_state=false)
+    # copy_logic_unit == false
+    control_unit = ControlUnit(logic_unit, control_url, copy_logic_unit=false)
 
-    @test control_unit.state isa TestControlState
-    @test control_unit.state === state
+    @test control_unit.logic_unit isa TestControlLogicUnit
+    @test control_unit.logic_unit === logic_unit
     @test control_unit.url == control_url
     @test control_unit.socket isa Socket
 
@@ -68,8 +68,8 @@ end
 @testset "ControlUnit: run()" begin
     # --- Preparations
 
-    state = TestControlState()
-    control_unit = ControlUnit(state, control_url)
+    logic_unit = TestControlLogicUnit()
+    control_unit = ControlUnit(logic_unit, control_url)
 
     # --- Tests
 
@@ -81,8 +81,8 @@ end
     connect(socket, control_url)
     send(socket, START)
     response = recv(socket, String)
-    @test control_unit.state.is_running == true
-    @test control_unit.state.count == 0
+    @test control_unit.logic_unit.is_running == true
+    @test control_unit.logic_unit.count == 0
     @test response == "SUCCESS"
 
     # Send STOP signal
@@ -90,8 +90,8 @@ end
     connect(socket, control_url)
     send(socket, STOP)
     response = recv(socket, String)
-    @test control_unit.state.is_running == false
-    @test control_unit.state.count == 0
+    @test control_unit.logic_unit.is_running == false
+    @test control_unit.logic_unit.count == 0
     @test response == "SUCCESS"
 
     # Send INCREMENT signal
@@ -99,8 +99,8 @@ end
     connect(socket, control_url)
     send(socket, INCREMENT)
     response = recv(socket, String)
-    @test control_unit.state.is_running == false
-    @test control_unit.state.count == 1
+    @test control_unit.logic_unit.is_running == false
+    @test control_unit.logic_unit.count == 1
     @test response == "SUCCESS"
 
     # Send unknown signal
@@ -108,7 +108,7 @@ end
     connect(socket, control_url)
     send(socket, 100)
     response = recv(socket, String)
-    @test response == get_exception_signal(TestControlState)
+    @test response == get_exception_signal(TestControlLogicUnit)
 
     # --- Clean up
 

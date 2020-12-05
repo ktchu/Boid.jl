@@ -14,7 +14,7 @@ module Boid
 
 # Abstract Types
 include("AbstractChannelData.jl")
-include("AbstractControlState.jl")
+include("AbstractControlLogicUnit.jl")
 include("AbstractNodeData.jl")
 include("AbstractProcessingCore.jl")
 
