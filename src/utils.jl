@@ -23,7 +23,7 @@ Construct IPC URL from `ipc_dir` and `ipc_name`.
 function construct_ipc_url(ipc_dir::String, ipc_name::String)
     if occursin("ipc://", ipc_dir)
         if !startswith(ipc_dir, "ipc://")
-            message = """Invalid `ipc_dir` "$(ipc_dir)"."""
+            message = """Invalid `ipc_dir` "$ipc_dir"."""
             throw(ArgumentError(message))
         end
     elseif !startswith(ipc_dir, "ipc://")
