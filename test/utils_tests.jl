@@ -52,4 +52,12 @@ using Boid
     ipc_name = "ipc-name"
     ipc_url = construct_ipc_url(ipc_dir, ipc_name)
     @test ipc_url == "ipc:///path/to/ipc/dir/ipc-name"
+
+    # --- error cases
+
+    ipc_dir = "invalid://ipc:///path/to/ipc/dir"
+    ipc_name = "ipc-name"
+    expected_message = """Invalid `ipc_dir` "$(ipc_dir)"."""
+    @test_throws(ArgumentError(expected_message),
+                 construct_ipc_url(ipc_dir, ipc_name))
 end
