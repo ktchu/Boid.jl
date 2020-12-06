@@ -71,7 +71,7 @@ function OutputChannel(data_type::Type{<:AbstractChannelData},
         connect(socket, url)
     end
 
-    # Return new ControlUnit
+    # Return new OutputChannel
     OutputChannel(data, url, socket)
 end
 
@@ -88,7 +88,7 @@ function publish(channel::OutputChannel, value)
     send(channel.socket, message)
 
     # Update channel data
-    set_data!(channel.data, data, decode=false)
+    set_data!(channel.data, value, decode=false)
 end
 
 """

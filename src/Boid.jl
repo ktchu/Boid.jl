@@ -12,16 +12,13 @@ contained in the LICENSE file.
 """
 module Boid
 
-# Abstract Types
-include("AbstractChannelData.jl")
-include("AbstractControlLogicUnit.jl")
-include("AbstractNodeData.jl")
 include("AbstractProcessingCore.jl")
 
-# Concrete Types
+include("AbstractChannelData.jl")
 include("InputChannel.jl")
 include("OutputChannel.jl")
 
+include("AbstractControlLogicCore.jl")
 include("ControlUnit.jl")
 
 include("Node.jl")

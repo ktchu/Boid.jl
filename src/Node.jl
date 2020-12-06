@@ -36,32 +36,28 @@ struct Node
 
         * `id`: id
 
-      * __Processing Components__
+      * __Components__
 
         * `processing_core`: processing core
-
-        * `data`: data storage
-
-      * __Node Operation Components__
 
         * `control_unit`: control unit
 
         * `output_channel`: channel for publishing output
 
         * `input_channels`: channels for listening for inputs
+
+        * `input_data`: TODO
     =#
 
     # Attributes
     id::String
 
-    # Processing Components
+    # Components
     processing_core::AbstractProcessingCore
-    data::AbstractNodeData
-
-    # Node Operation Components
     control_unit::ControlUnit
     output_channel::OutputChannel
     input_channels::Vector{InputChannel}
+    input_data::Vector
 end
 
 # --- Constructors
@@ -81,12 +77,13 @@ unit, output channel, and input channels, respectively.
 
 ### ControlUnit Parameters
 
-* `state`<:AbstractControlState - control state for Node
+* `logic_core`<:AbstractControlLogicCore - control logic unit for Node
 
 * `url`::String - URL that the ControlUnit listens for control signals on
 
-* `copy_state`::Bool - set to true if the ControlUnit should be initialized
-  with a copy of `state`; set to false otherwise
+* `copy_logic_core`::Bool - set to true if the ControlUnit should be
+  initialized with a copy of `logic_core`; set to false if the ControlUnit
+  is set to point to the instance referenced by `logic_core`.
 
 * `use_bind`::Bool - set to true if the ZMQ Socket that the ControlUnit
   listens for control signals on should be connected to `url` using the
@@ -118,7 +115,6 @@ unit, output channel, and input channels, respectively.
 """
 function Node(id::String,
               processing_core::AbstractProcessingCore,
-              data_type::Type{<:AbstractNodeData},
               control_unit_params::Dict,
               output_channel_params::Dict,
               input_channel_params::Vector{Dict})
@@ -126,7 +122,7 @@ function Node(id::String,
     # --- Check arguments
 
     # Check for required parameters for control unit
-    required_params = ["state", "url"]
+    required_params = ["logic_core", "url"]
     for param in required_params
         if !haskey(control_unit_params, param)
             message = "`control_unit_params` is missing required parameter: " *
@@ -161,14 +157,12 @@ function Node(id::String,
 
     # --- Construct components
 
-    # Construct data
-    data = data_type()
-
     # Construct control unit
     control_unit =
-        ControlUnit(control_unit_params["state"],
+        ControlUnit(control_unit_params["logic_core"],
                     control_unit_params["url"],
-                    copy_state=get(control_unit_params, "copy_state", true),
+                    copy_logic_core=get(control_unit_params,
+                                        "copy_logic_core", true),
                     use_bind=get(control_unit_params, "use_bind", true))
 
     # Construct output channel
@@ -188,23 +182,94 @@ function Node(id::String,
         push!(input_channels, input_channel)
     end
 
+    # Construct storage for input data
+    input_data = Vector(undef, length(input_channels))
+
     # --- Construct new Node
 
-    node = Node(id, processing_core, data,
-                control_unit, output_channel, input_channels)
+    node = Node(id, processing_core,
+                control_unit, output_channel, input_channels, input_data)
 end
 
 # --- Method definitions
 
-function run(node::Node)
-    # Start control unit
-    @async run(control_unit)
+# Constants
+INIT_SLEEP_TIME = 0.001
 
-    # Start input channels
+"""
+    run(node::Node)
+
+Activate all of the operational components of `node` and start running the
+main processing loop.
+"""
+function run(node::Node)
+    # --- Start input channels
+
     for channel in node.input_channels
         @async listen(channel)
     end
 
-    # Run main processing loop
-    # TODO
+    # Wait for input channels to be in 'listening' state
+    for channel in node.input_channels
+        while !is_listening(channel)
+            sleep(INIT_SLEEP_TIME)
+        end
+    end
+
+    # --- Start control unit
+
+    @async run(node.control_unit)
+
+    # Wait for control unit to be in 'running' state
+    while !is_running(node)
+        sleep(INIT_SLEEP_TIME)
+    end
+
+    # --- Run main processing loop
+
+    run_processing_loop!(node)
+end
+
+"""
+    run_processing_loop!(node::Node)
+
+Run main processing loop.
+"""
+function run_processing_loop!(node::Node)
+    while is_running(node)
+        # Wait for input to be ready for processing
+        wait_for_input_ready(node.control_unit, node.input_channels)
+
+        # Gather input
+        gather_input!(node)
+
+        # Process input
+        result = process_data!(node.processing_core, node.input_data)
+
+        # Publish output
+        publish(node.output_channel, result)
+
+        # Sleep to give other tasks a chance to run
+        # TODO: improve design and implementation. One possibility would
+        #       be to use round-robin between control and input processing
+        sleep(0.001)
+    end
+end
+
+"""
+    is_running(node::Node)
+
+Return true if the Node is running; return false otherwise.
+"""
+is_running(node::Node) = is_running(node.control_unit)
+
+"""
+    gather_input(node::Node)
+
+Gather input from the input channels of `node`.
+"""
+function gather_input!(node::Node)
+    for (i, channel) in enumerate(node.input_channels)
+        node.input_data[i] = get_last_value(channel)
+    end
 end

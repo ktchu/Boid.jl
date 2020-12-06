@@ -24,8 +24,7 @@ using Boid
 
 # Concrete subtypes of abstract types
 include("fixtures/TestChannelData.jl")
-include("fixtures/TestControlState.jl")
-include("fixtures/TestNodeData.jl")
+include("fixtures/TestControlLogicCore.jl")
 include("fixtures/TestProcessingCore.jl")
 
 # Constants
@@ -68,9 +67,9 @@ end
     processing_core = TestProcessingCore()
 
     control_unit_params = Dict(
-        "state"=>TestControlState(),
+        "logic_core"=>TestControlLogicCore(),
         "url"=>control_url,
-        "copy_state"=>false)
+        "copy_logic_core"=>false)
 
     output_channel_params = Dict(
         "url"=>output_url,
@@ -88,26 +87,31 @@ end
 
     # ------- Normal usage
 
-    node = Node(id, processing_core, TestNodeData,
+    node = Node(id, processing_core,
                 control_unit_params,
                 output_channel_params,
                 input_channel_params)
 
     @test node.control_unit isa ControlUnit
+    @test node.output_channel isa OutputChannel
+    @test node.input_channels isa Vector{InputChannel}
+    @test node.input_data isa Vector
+    @test length(node.input_data) == length(input_channel_params)
+    @test !is_running(node)
 
     # TODO: add tests
 
     # ------ Error cases
 
     # Invalid `control_unit_params`
-    required_params = ["state", "url"]
+    required_params = ["logic_core", "url"]
     for param in required_params
         invalid_control_unit_params = copy(control_unit_params)
         delete!(invalid_control_unit_params, param)
         expected_message =
             "`control_unit_params` is missing required parameter: `$param`"
         @test_throws(ArgumentError(expected_message),
-                     Node(id, processing_core, TestNodeData,
+                     Node(id, processing_core,
                           invalid_control_unit_params,
                           output_channel_params,
                           input_channel_params))
@@ -121,7 +125,7 @@ end
         expected_message =
             "`output_channel_params` is missing required parameter: `$param`"
         @test_throws(ArgumentError(expected_message),
-                     Node(id, processing_core, TestNodeData,
+                     Node(id, processing_core,
                           control_unit_params,
                           invalid_output_channel_params,
                           input_channel_params))
@@ -136,7 +140,7 @@ end
             expected_message =
             "`input_channel_params[$i]` is missing required parameter: `$param`"
             @test_throws(ArgumentError(expected_message),
-                         Node(id, processing_core, TestNodeData,
+                         Node(id, processing_core,
                               control_unit_params,
                               output_channel_params,
                               invalid_input_channel_params))
@@ -156,9 +160,9 @@ end
     processing_core = TestProcessingCore()
 
     control_unit_params = Dict(
-        "state"=>TestControlState(),
+        "logic_core"=>TestControlLogicCore(),
         "url"=>control_url,
-        "copy_state"=>false)
+        "copy_logic_core"=>false)
 
     output_channel_params = Dict(
         "url"=>output_url,
@@ -173,23 +177,45 @@ end
     end
 
     # Construct Node
-    node = Node(id, processing_core, TestNodeData,
+    node = Node(id, processing_core,
                 control_unit_params,
                 output_channel_params,
                 input_channel_params)
 
+    # Construct control socket
+    control_socket = Socket(REQ)
+    connect(control_socket, control_url)
+
     # --- Tests
 
     # Start node
-    run(node)
+    run_node_task = @task run(node)
+    schedule(run_node_task)
 
-    # Check state of input channels
+    # Wait for node to finish initializing
+    while !is_running(node)
+        sleep(0.1)
+    end
+
+    # Check that node is in 'running' state
+    @test is_running(node)
+
+    # Check that input channels are all in the 'listening' state
     for channel in node.input_channels
-        while !channel.state.is_listening
+        while !is_listening(channel)
             sleep(0.1)
         end
         @test channel.state.is_listening
     end
+
+    # Send STOP signal
+    send(control_socket, STOP)
+    response = recv(control_socket, String)
+    @test response == "SUCCESS"
+
+    # Wait for node to finish running
+    wait(run_node_task)
+    @test !is_running(node)
 
     # --- Clean up
 

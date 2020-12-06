@@ -16,6 +16,18 @@ using Boid: AbstractProcessingCore
 # --- Type definitions
 
 mutable struct TestProcessingCore <: AbstractProcessingCore
+    # Data
+    field_1::Float64
+    field_2::Float64
+
     # Default constructor
-    TestProcessingCore() = new()
+    TestProcessingCore() = new(0.1, 1)
+end
+
+# --- Method definitions
+
+function Boid.process_data!(processing_core::TestProcessingCore, data::Vector)
+    processing_core.field_1 = data[1]
+    processing_core.field_2 = data[2]
+    return processing_core.field_1 + processing_core.field_2
 end

@@ -17,14 +17,17 @@ export AbstractProcessingCore
 
 # ------ Functions
 
-# TODO
+export process_data!
 
 # --- Type definitions
 
 """
     AbstractProcessingCore
 
-Supertype for all processing core types.
+Supertype for all processing core types. Concrete subtypes should be defined
+with any data required to perform its processing functions. In general,
+concrete subtypes should be mutable when the process core maintains
+_modifiable_ data.
 
 Interface
 =========
@@ -34,3 +37,15 @@ Functions
 * TODO
 """
 abstract type AbstractProcessingCore end
+
+# --- Method definitions
+#
+# Note: the following method definitions are no-op place holders to provide
+#       a central location for docstrings.
+
+"""
+    process_data!(processing_core::AbstractProcessingCore, data::Vector)
+
+Return the result of using `processing_core` to process `data`.
+"""
+process_data!(processing_core::AbstractProcessingCore, data::Vector) = nothing

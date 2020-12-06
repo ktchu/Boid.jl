@@ -17,7 +17,8 @@ export InputChannel
 
 # ------ Functions
 
-export listen, loop_listen, get_last_value
+export listen, loop_listen, is_listening
+export get_last_value
 
 # --- Type definitions
 
@@ -80,7 +81,7 @@ function InputChannel(data_type::Type{<:AbstractChannelData},
         connect(socket, url)
     end
 
-    # Return new ControlUnit
+    # Return new InputChannel
     InputChannel(state, data, url, socket)
 end
 
@@ -126,6 +127,13 @@ function loop_listen(channel::InputChannel)
         @async listen(channel)
     end
 end
+
+"""
+    is_listening(channel::InputChannel)
+
+Return true if `channel` is in 'listening' state; return false otherwise.
+"""
+is_listening(channel::InputChannel) = channel.state.is_listening
 
 """
     get_last_value(channel::InputChannel)
