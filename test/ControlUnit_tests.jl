@@ -81,16 +81,7 @@ end
     connect(socket, control_url)
     send(socket, START)
     response = recv(socket, String)
-    @test control_unit.logic_core.is_running == true
-    @test control_unit.logic_core.count == 0
-    @test response == "SUCCESS"
-
-    # Send STOP signal
-    socket = Socket(REQ)
-    connect(socket, control_url)
-    send(socket, STOP)
-    response = recv(socket, String)
-    @test control_unit.logic_core.is_running == false
+    @test is_running(control_unit)
     @test control_unit.logic_core.count == 0
     @test response == "SUCCESS"
 
@@ -99,7 +90,7 @@ end
     connect(socket, control_url)
     send(socket, INCREMENT)
     response = recv(socket, String)
-    @test control_unit.logic_core.is_running == false
+    @test is_running(control_unit)
     @test control_unit.logic_core.count == 1
     @test response == "SUCCESS"
 
@@ -109,6 +100,15 @@ end
     send(socket, 100)
     response = recv(socket, String)
     @test response == get_exception_signal(TestControlLogicCore)
+
+    # Send STOP signal
+    socket = Socket(REQ)
+    connect(socket, control_url)
+    send(socket, STOP)
+    response = recv(socket, String)
+    @test !is_running(control_unit)
+    @test control_unit.logic_core.count == 1
+    @test response == "SUCCESS"
 
     # --- Clean up
 
