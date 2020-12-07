@@ -17,6 +17,7 @@ export AbstractChannelData
 
 # ------ Functions
 
+import ZMQ.get_type
 export get_data, set_data!
 export encode_value, decode_value
 
@@ -25,7 +26,8 @@ export encode_value, decode_value
 """
     AbstractChannelData
 
-Supertype for channel data types. Concrete subtypes should
+Supertype for types that store and encode/decode data transmitted by input and
+output channels. Concrete subtypes should
 
 * possess a default constructor with no arguments and
 
@@ -34,6 +36,8 @@ Supertype for channel data types. Concrete subtypes should
 
 Interface
 =========
+
+    get_type(channel_data::AbstractChannelData)
 
     get_data(channel_data::AbstractChannelData)
 
@@ -49,6 +53,13 @@ abstract type AbstractChannelData end
 #
 # Note: the following method definitions are no-op place holders to provide
 #       a central location for docstrings.
+
+"""
+    get_type(channel_data::AbstractChannelData)
+
+Return the type of the data handled by `channel_data`.
+"""
+get_type(channel_data::AbstractChannelData) = nothing
 
 """
     get_data(channel_data::AbstractChannelData; encode::Bool=false)

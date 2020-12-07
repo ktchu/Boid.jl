@@ -17,7 +17,6 @@ using Boid: AbstractChannelData
 # --- Type definitions
 
 mutable struct TestChannelData <: AbstractChannelData
-    node::Node
     data::Float64
 
     # Default constructor
@@ -25,6 +24,8 @@ mutable struct TestChannelData <: AbstractChannelData
 end
 
 # --- Method definitions
+
+Boid.get_type(channel_data::TestChannelData) = typeof(channel_data.data)
 
 Boid.get_data(channel_data::TestChannelData; encode::Bool=false) =
     encode ?

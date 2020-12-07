@@ -18,25 +18,18 @@ export AbstractControlLogicCore
 
 # ------ Functions
 
-export decode_control_signal, process_control_signal!
-export get_exception_signal
-export set_running!, is_running
 export wait_for_input_ready
+export decode_control_signal, process_control_signal!
 
 # --- Type definitions
 
 """
     AbstractControlLogicCore
 
-Supertype for control logic core types. In general, concrete subtypes should
-be mutable when the control logic core maintains modifiable control state.
+Supertype for control logic core types.
 
 Interface
 =========
-
-    set_running!(logic_core::AbstractControlLogicCore)
-
-    is_running(logic_core::AbstractControlLogicCore)
 
     wait_for_input_ready(logic_core::AbstractControlLogicCore,
                          input_channels::Vector{InputChannel})
@@ -44,9 +37,11 @@ Interface
     decode_control_signal(::Type{<:AbstractControlLogicCore},
                           bytes::Vector{UInt8})
 
-    get_exception_signal(::Type{<:AbstractControlLogicCore})
-
     process_control_signal!(signal, logic_core::AbstractControlLogicCore)
+
+    get_state(logic_core::AbstractControlLogicCore)
+
+    set_state!(logic_core::AbstractControlLogicCore, state::Dict)
 
 Common Signals to Support
 -------------------------
@@ -59,20 +54,6 @@ abstract type AbstractControlLogicCore end
 #
 # Note: the following method definitions are no-op place holders to provide
 #       a central location for docstrings.
-
-"""
-    set_running!(logic_core::AbstractControlLogicCore)
-
-Put `logic_core` into running state.
-"""
-set_running!(logic_core::AbstractControlLogicCore) = nothing
-
-"""
-    is_running(logic_core::AbstractControlLogicCore)
-
-Return true if the Node is running; return false otherwise.
-"""
-is_running(logic_core::AbstractControlLogicCore) = nothing
 
 """
     wait_for_input_ready(logic_core::AbstractControlLogicCore,
@@ -88,21 +69,30 @@ wait_for_input_ready(logic_core::AbstractControlLogicCore,
                           bytes::Vector{UInt8})
 
 Convert `bytes` to a signal that is understood by `process_control_signal()`.
+Throw an ArgumentError if `bytes` does not convert to a valid signal.
 """
-decode_control_signal(::Type{<:AbstractControlLogicCore}, bytes::Vector{UInt8}) =
-    nothing
-
-"""
-    get_exception_signal(::Type{<:AbstractControlLogicCore})
-
-Return the response to send when `process_control_signal()` fails.
-"""
-get_exception_signal(::Type{<:AbstractControlLogicCore}) = nothing
+decode_control_signal(::Type{<:AbstractControlLogicCore},
+                      bytes::Vector{UInt8}) = nothing
 
 """
     process_control_signal!(logic_core::AbstractControlLogicCore, signal)
 
-Process the control `signal`, updating `logic_core` and returning a response as
-appropriate.
+Process the control `signal` updating the data fields of `logic_core`, if
+necesasry. Return an appropriate status response.
 """
 process_control_signal!(logic_core::AbstractControlLogicCore, signal) = nothing
+
+"""
+    get_state(logic_core::AbstractControlLogicCore)
+
+Return a Dict containing sufficient information to reconstruct the operational
+state of `logic_core`.
+"""
+get_state(logic_core::AbstractControlLogicCore) = nothing
+
+"""
+    set_state!(logic_core::AbstractControlLogicCore, state::Dict)
+
+Set the operational state of `logic_core` using values from `state`.
+"""
+set_state!(logic_core::AbstractControlLogicCore, state::Dict) = nothing

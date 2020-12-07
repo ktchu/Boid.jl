@@ -65,7 +65,7 @@ end
     _tearDown()
 end
 
-@testset "ControlUnit: run()" begin
+@testset "ControlUnit: run!()" begin
     # --- Preparations
 
     logic_core = TestControlLogicCore()
@@ -73,44 +73,72 @@ end
 
     # --- Tests
 
-    # Start run()
-    @async run(control_unit)
+    # Start control signal processing
+    run!(control_unit)
 
-    # Send START signal
+    # Send Boid.START signal
     socket = Socket(REQ)
     connect(socket, control_url)
-    send(socket, START)
-    response = recv(socket, String)
+    send(socket, Boid.START)
+    response = recv(socket, ControlUnitResponse)
     @test is_running(control_unit)
+    @test !is_terminated(control_unit)
     @test control_unit.logic_core.count == 0
-    @test response == "SUCCESS"
+    @test response == Boid.SUCCESS
 
     # Send INCREMENT signal
     socket = Socket(REQ)
     connect(socket, control_url)
     send(socket, INCREMENT)
-    response = recv(socket, String)
+    response = recv(socket, ControlUnitResponse)
     @test is_running(control_unit)
+    @test !is_terminated(control_unit)
     @test control_unit.logic_core.count == 1
-    @test response == "SUCCESS"
+    @test response == Boid.SUCCESS
 
     # Send unknown signal
     socket = Socket(REQ)
     connect(socket, control_url)
     send(socket, 100)
-    response = recv(socket, String)
-    @test response == get_exception_signal(TestControlLogicCore)
+    response = recv(socket, ControlUnitResponse)
+    @test response == Boid.UNKNOWN_SIGNAL
 
-    # Send STOP signal
+    # Send Boid.STOP signal
     socket = Socket(REQ)
     connect(socket, control_url)
-    send(socket, STOP)
-    response = recv(socket, String)
+    send(socket, Boid.STOP)
+    response = recv(socket, ControlUnitResponse)
     @test !is_running(control_unit)
+    @test !is_terminated(control_unit)
     @test control_unit.logic_core.count == 1
-    @test response == "SUCCESS"
+    @test response == Boid.SUCCESS
+
+    # Send Boid.TERMINATED signal
+    socket = Socket(REQ)
+    connect(socket, control_url)
+    send(socket, Boid.TERMINATE)
+    response = recv(socket, ControlUnitResponse)
+    @test !is_running(control_unit)
+    @test is_terminated(control_unit)
+    @test response == Boid.SUCCESS
 
     # --- Clean up
 
     _tearDown()
+end
+
+@testset "ControlUnit: process_control_signal!()" begin
+    @test_skip 1
+end
+
+@testset "ControlUnit: is_running()" begin
+    @test_skip 1
+end
+
+@testset "ControlUnit: is_terminated()" begin
+    @test_skip 1
+end
+
+@testset "ControlUnit: wait_for_input_ready()" begin
+    @test_skip 1
 end

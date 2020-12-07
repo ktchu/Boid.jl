@@ -183,12 +183,13 @@ function Node(id::String,
     end
 
     # Construct storage for input data
+    # TODO: initialize to default value
     input_data = Vector(undef, length(input_channels))
 
     # --- Construct new Node
 
-    node = Node(id, processing_core,
-                control_unit, output_channel, input_channels, input_data)
+    Node(id, processing_core,
+         control_unit, output_channel, input_channels, input_data)
 end
 
 # --- Method definitions
@@ -203,22 +204,38 @@ Activate all of the operational components of `node` and start running the
 main processing loop.
 """
 function run(node::Node)
-    # --- Start input channels
+    # --- Start listening on all input channels
 
     for channel in node.input_channels
-        @async listen(channel)
-    end
-
-    # Wait for input channels to be in 'listening' state
-    for channel in node.input_channels
-        while !is_listening(channel)
-            sleep(INIT_SLEEP_TIME)
-        end
+        loop_listen(channel)
     end
 
     # --- Start control unit
 
-    @async run(node.control_unit)
+    # TODO
+
+    # --- TODO: Do we need to verify input connections?
+
+    # TODO: Consider this alternative as simplification to async implementation
+    #
+    # --- Set control unit to be in 'running' state
+    #
+    # set_running(node.control_unit)
+    #
+    # --- Main processing loop
+    #
+    # set_running!(node.control_unit)
+    #
+    # while is_running(node)
+    #     channel = Channel()
+    #     @async process_control_signal(); put!(channel, :received)
+    #     sleep(CONTROL_CHANNEL_TIMEOUT)
+    #     close(channel)
+    #
+    #     process_inputs()
+    # end
+
+    # --- Start control unit
 
     # Wait for control unit to be in 'running' state
     while !is_running(node)
@@ -241,7 +258,7 @@ function run_processing_loop!(node::Node)
         wait_for_input_ready(node.control_unit, node.input_channels)
 
         # Gather input
-        gather_input!(node)
+        fetch_input!(node)
 
         # Process input
         result = process_data!(node.processing_core, node.input_data)
@@ -264,11 +281,18 @@ Return true if the Node is running; return false otherwise.
 is_running(node::Node) = is_running(node.control_unit)
 
 """
-    gather_input(node::Node)
+    is_terminated(node::Node)
+
+Return true if the Node is terminated; return false otherwise.
+"""
+is_terminated(node::Node) = is_terminated(node.control_unit)
+
+"""
+    fetch_input(node::Node)
 
 Gather input from the input channels of `node`.
 """
-function gather_input!(node::Node)
+function fetch_input!(node::Node)
     for (i, channel) in enumerate(node.input_channels)
         node.input_data[i] = get_last_value(channel)
     end

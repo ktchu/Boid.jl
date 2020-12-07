@@ -90,11 +90,12 @@ end
 """
     listen(channel::InputChannel)
 
-Listen for incoming message on `channel`.
+Listen for a single incoming message on `channel`.
 
 Notes
 -----
-* It is often useful to call `listen()` within an asynchronous Task.
+* To listen for a message without blocking, call `listen()` within an
+  asynchronous Task.
 """
 function listen(channel::InputChannel)
     # Preparations
@@ -120,11 +121,14 @@ end
 """
     loop_listen(channel::InputChannel)
 
-Start continuous listening loop for `channel`.
+Start loop to continuously and asynchronously listen for incoming messages on
+`channel`.
 """
 function loop_listen(channel::InputChannel)
-    while true
-        @async listen(channel)
+    @async begin
+        while true
+            listen(channel)
+        end
     end
 end
 
