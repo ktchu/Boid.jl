@@ -68,7 +68,7 @@ wait_for_input_ready(logic_core::AbstractControlLogicCore,
     decode_control_signal(::Type{<:AbstractControlLogicCore},
                           bytes::Vector{UInt8})
 
-Convert `bytes` to a signal that is understood by `process_control_signal()`.
+Convert `bytes` to a signal that is understood by `process_control_signal!()`.
 Throw an ArgumentError if `bytes` does not convert to a valid signal.
 """
 decode_control_signal(::Type{<:AbstractControlLogicCore},

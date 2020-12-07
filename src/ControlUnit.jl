@@ -59,7 +59,7 @@ Built-in control unit signals.
 TODO: document reserved control signal values, including "nothing"
 """
 
-@enum BuiltInControlSignal::Int8 begin
+@enum BuiltInControlSignal begin
     START = -1
     STOP = -2
     TERMINATE = -3
@@ -162,10 +162,7 @@ function process_control_signal!(control_unit::ControlUnit)
 
     # Attempt to interpret as a built-in control signal
     try
-        signal = reinterpret(BuiltInControlSignal, message)[1]
-        if !(signal in BUILT_IN_CONTROL_SIGNALS)
-            throw(ArgumentError)
-        end
+        signal = _decode_control_signal(ControlUnit, message)
     catch ArgumentError
         signal = nothing
     end
@@ -192,7 +189,7 @@ function process_control_signal!(control_unit::ControlUnit)
     # Process valid signal
     if signal in BUILT_IN_CONTROL_SIGNALS
         try
-            response = _process_built_in_control_signal!(control_unit, signal)
+            response = _process_in_control_signal!(control_unit, signal)
         catch
             response = FAILED
 
@@ -247,11 +244,28 @@ end
 # --- Private helper functions
 
 """
-    _process_built_in_control_signal!(control_unit::ControlUnit, signal)
+    _decode_control_signal(::control_unit::ControlUnit, bytes::Vector{UInt8})
+
+Convert `bytes` to a signal that is understood by `_process_control_signal!()`.
+Throw an ArgumentError if `bytes` does not convert to a valid signal.
+"""
+function _decode_control_signal(::Type{ControlUnit}, bytes::Vector{UInt8})
+
+    signal = reinterpret(BuiltInControlSignal, bytes)[1]
+
+    if !(signal in BUILT_IN_CONTROL_SIGNALS)
+        throw(ArgumentError)
+    end
+
+    return signal
+end
+
+"""
+    _process_in_control_signal!(control_unit::ControlUnit, signal)
 
 Process built-in control signals. Return response
 """
-function _process_built_in_control_signal!(control_unit::ControlUnit, signal)
+function _process_in_control_signal!(control_unit::ControlUnit, signal)
 
     if signal == START
         control_unit.state["mode"] = RUNNING
