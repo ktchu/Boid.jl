@@ -209,7 +209,8 @@ function process_control_signal!(control_unit::ControlUnit)
         end
     end
 
-    # Send response
+    # --- Send response
+
     if isnothing(response)
         response = ""
     end
