@@ -18,7 +18,7 @@ export InputChannel
 # ------ Functions
 
 export listen, loop_listen, is_listening
-export get_last_value
+export get_value
 
 # --- Type definitions
 
@@ -140,8 +140,8 @@ Return true if `channel` is in 'listening' state; return false otherwise.
 is_listening(channel::InputChannel) = channel.state.is_listening
 
 """
-    get_last_value(channel::InputChannel)
+    get_value(channel::InputChannel)
 
 Return the most recent data value received by `channel`.
 """
-get_last_value(channel::InputChannel) = get_data(channel.data)
+get_value(channel::InputChannel) = get_data(channel.data)

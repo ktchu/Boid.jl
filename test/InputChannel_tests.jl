@@ -62,7 +62,7 @@ end
     bind(socket, input_url)
 
     # Get initial value of input channel data
-    initial_channel_value = get_last_value(input_channel)
+    initial_channel_value = get_value(input_channel)
 
     # --- Tests
 
@@ -83,7 +83,7 @@ end
     while input_channel.state.is_listening
         sleep(0.1)
     end
-    @test get_last_value(input_channel) == data_sent
+    @test get_value(input_channel) == data_sent
     @test !input_channel.state.is_listening
 
     # --- Clean up
