@@ -11,6 +11,7 @@ contained in the LICENSE file.
 """
 # --- Imports
 
+using Boid: Boid
 using Boid: AbstractProcessingCore
 
 # --- Type definitions
