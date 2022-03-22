@@ -1,5 +1,6 @@
 """
-The MethodTemplate.jl module demonstrates a Julia module.
+The Boid.jl module defines types and functions to support autonomous,
+distributed computing/processing.
 
 ------------------------------------------------------------------------------
 COPYRIGHT/LICENSE. This file is part of the XYZ package. It is subject to
@@ -9,22 +10,20 @@ copied, modified, propagated, or distributed except according to the terms
 contained in the LICENSE file.
 ------------------------------------------------------------------------------
 """
-# --- Exports
+module Boid
 
-export say_hello, add_one
+include("AbstractProcessingCore.jl")
 
-# --- Method definitions
+include("AbstractChannelData.jl")
+include("InputChannel.jl")
+include("OutputChannel.jl")
 
-"""
-    say_hello(who::String)
+include("AbstractControlLogicCore.jl")
+include("ControlUnit.jl")
 
-Return "Hello, `who`".
-"""
-say_hello(who::String) = "Hello, $who"
+include("Node.jl")
 
-"""
-    add_one(x)
+# Methods
+include("utils.jl")
 
-Return `x + 1`.
-"""
-add_one(x) = x + 1
+end  # End of Boid.jl module

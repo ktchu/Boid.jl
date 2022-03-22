@@ -11,11 +11,22 @@ contained in the LICENSE file.
 """
 # --- Imports
 
-using Test, TestSetExtensions
+# External packages
+using Documenter
+using Test
+using TestSetExtensions
 
+# Boid.jl
+using Boid
 
 # --- Test sets
 
 @testset ExtendedTestSet "All the tests" begin
-    @includetests
+    @testset "Doctests" begin
+        doctest(Boid)
+    end
+
+    @testset "Unit tests" begin
+        @includetests ARGS
+    end
 end
