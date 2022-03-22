@@ -12,6 +12,7 @@ contained in the LICENSE file.
 # --- Imports
 
 using Serialization: serialize, deserialize
+using Boid: Boid
 using Boid: AbstractChannelData
 
 # --- Type definitions

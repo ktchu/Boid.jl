@@ -14,13 +14,16 @@ contained in the LICENSE file.
 # External packages
 using Documenter
 using Test
-using TestSetExtensions
+using TestTools: jltest
+#using TestSetExtensions
 
 # Boid.jl
 using Boid
 
 # --- Test sets
 
+jltest.run_tests(@__DIR__)
+#=
 @testset ExtendedTestSet "All the tests" begin
     @testset "Doctests" begin
         doctest(Boid)
@@ -30,3 +33,4 @@ using Boid
         @includetests ARGS
     end
 end
+=#

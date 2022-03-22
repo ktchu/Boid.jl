@@ -11,7 +11,8 @@ contained in the LICENSE file.
 """
 # --- Imports
 
-using Boid: AbstractControlLogicCore
+using Boid: Boid
+using Boid: AbstractControlLogicCore, InputChannel
 
 # --- Type definitions
 
