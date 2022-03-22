@@ -154,6 +154,7 @@ end
 end
 
 @testset "Node: run()" begin
+
     # --- Preparations
 
     id = "node-1"
@@ -194,6 +195,7 @@ end
     run_node_task = @task run(node)
     schedule(run_node_task)
 
+#=
     # Wait for node to finish initializing
     while !is_running(node)
         sleep(0.1)
@@ -219,6 +221,7 @@ end
     wait(run_node_task)
     @test !is_running(node)
 
+=#
     # --- Clean up
 =#
     _tearDown()
