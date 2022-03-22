@@ -15,11 +15,11 @@ DocMeta.setdocmeta!(Boid, :DocTestSetup, :(using Boid); recursive=true)
 makedocs(;
     modules=[Boid],
     authors="Kevin Chu <kevin@velexi.com> and contributors",
-    repo="https://github.com/velexi-corporation/Boid.jl/blob/{commit}{path}#{line}",
+    repo="https://github.com/ktchu/Boid.jl/blob/{commit}{path}#{line}",
     sitename="Boid",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://velexi-corporation.github.io/Boid.jl/stable",
+        canonical="https://ktchu.github.io/Boid.jl/stable",
         assets=String[],
     ),
     pages=[
@@ -33,4 +33,4 @@ makedocs(;
 
 # --- Deploy documentation
 
-deploydocs(; repo="github.com/velexi-corporation/Boid.jl", devbranch="main")
+deploydocs(; repo="github.com/ktchu/Boid.jl", devbranch="main")
