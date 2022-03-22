@@ -24,9 +24,12 @@ jobs:
       fail-fast: false
 
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
-        arch: [x64, x86]
-        version: ['1.6', '1.7']
+        #os: [ubuntu-latest, windows-latest, macOS-latest]
+        #arch: [x64, x86]
+        #version: ['1.6', '1.7']
+        os: [ubuntu-latest]
+        arch: [x64]
+        version: ['1.7']
 
         exclude:
           - os: macos-latest
