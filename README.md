@@ -17,9 +17,7 @@ Boid.jl
     <td>Build Status</td>
     <td>
       <a href="https://github.com/ktchu/Boid.jl/actions/workflows/CI.yml"><img style="vertical-align: bottom;" src="https://github.com/ktchu/Boid.jl/actions/workflows/CI.yml/badge.svg"/></a>
-      <!--
-      <a href="https://codecov.io/gh/ktchu/Boid.jl"><img style="vertical-align: bottom;" src="https://codecov.io/gh/ktchu/Boid.jl/branch/main/graph/badge.svg?token=LW2DS0JUWF"/></a>
-      -->
+      <a href="https://codecov.io/gh/ktchu/Boid.jl"><img style="vertical-align: bottom;" src="https://codecov.io/gh/ktchu/Boid.jl/branch/main/graph/badge.svg?token=AWMDQ35NGU"/></a>
     </td>
   </tr>
 
