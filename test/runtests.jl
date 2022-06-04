@@ -15,22 +15,10 @@ contained in the LICENSE file.
 using Documenter
 using Test
 using TestTools: jltest
-#using TestSetExtensions
 
 # Boid.jl
 using Boid
 
-# --- Test sets
+# --- Run tests
 
 jltest.run_tests(@__DIR__)
-#=
-@testset ExtendedTestSet "All the tests" begin
-    @testset "Doctests" begin
-        doctest(Boid)
-    end
-
-    @testset "Unit tests" begin
-        @includetests ARGS
-    end
-end
-=#
