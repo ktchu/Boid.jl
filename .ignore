@@ -1,0 +1,14 @@
+# Sloc, Cloc and Code (scc) Configuration
+
+# --- Auto-generated files
+
+Project.toml
+pyproject.toml
+
+docs/build/
+
+# --- Data files
+
+*.csv
+
+# --- Miscellaneous files
