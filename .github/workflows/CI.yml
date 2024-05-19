@@ -69,7 +69,7 @@ jobs:
         # Only run for 'main' branch running on 'Linux' with the latest version of Julia
         if: |
             github.ref_name == 'main' &&
-            runner.os == 'Linux' &&
+            runner.os == env.codecov-os &&
             matrix.arch == env.codecov-arch &&
             matrix.version == env.codecov-version
 
@@ -81,7 +81,7 @@ jobs:
         # Only run for 'main' branch running on 'Linux' with the latest version of Julia
         if: |
             github.ref_name == 'main' &&
-            runner.os == 'Linux' &&
+            runner.os == env.codecov-os &&
             matrix.arch == env.codecov-arch &&
             matrix.version == env.codecov-version
 
